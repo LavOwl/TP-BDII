@@ -85,4 +85,12 @@ public class Route {
         this.tourGuideList = tourGuideList;
     }
 
+    public void addDriver(DriverUser driver){
+
+    }
+
+    public void addTourGuide(TourGuideUser tourGuide){
+        
+    }
+
 }
