@@ -3,11 +3,16 @@ package unlp.info.bd2.model;
 import java.util.Date;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -29,15 +34,17 @@ public class Purchase {
     @Column(name = "date", nullable = false)
     private Date date;
 
-    //Implement
+    @ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.DETACH}) //Cascading other operations can lead to infinite loops.
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
-    //Implement
-    private Route route;
+    @ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.DETACH}) //Cascading other operations can lead to infinite loops.
+    @JoinColumn(name = "route_id", referencedColumnName = "id", nullable = false)
+    private Route route; //Added Route reference to purchases to avoid null route_id through cascaded deletion.
 
-    //Implement
+    @OneToOne(mappedBy = "purchase", cascade = CascadeType.ALL, orphanRemoval = true)
     private Review review;
 
-    //Implement
+    @OneToMany(mappedBy = "purchase", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemService> itemServiceList;
 }
