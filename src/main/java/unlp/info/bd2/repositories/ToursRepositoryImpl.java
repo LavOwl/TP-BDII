@@ -83,13 +83,9 @@ public class ToursRepositoryImpl implements ToursRepository {
         session.close();
     }
 
-    public void saveOrUpdate(Stop stop) throws ToursException{
+    public void saveOrUpdateStop(Stop stop){
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-
-        if(stop.getName().contains("_") || stop.getName().contains("%")){
-            throw new ToursException("Cannot use '% or '_' in the name of a stop"); //Couldn't find an HQL function to avoid SQL injection, could manually map characters to /wildcard or similar, but would take too much time and effort.
-        }
 
         if (Objects.isNull(session.find(Stop.class, stop.getId()))) {
             session.persist(stop);
@@ -101,11 +97,8 @@ public class ToursRepositoryImpl implements ToursRepository {
         session.close();
     }
 
-    public List<Stop> getStopByNameStart(String name) throws ToursException{ //Needed to add "throws ToursException"
+    public List<Stop> getStopByNameStart(String name) {
         Session session = sessionFactory.openSession();
-        if(name.contains("_") || name.contains("%")){
-            throw new ToursException("Cannot use '% or '_' in the name of a stop"); //Couldn't find an HQL function to avoid SQL injection, could manually map characters to /wildcard or similar, but would take too much time and effort.
-        }
         List<Stop> stops = session.createQuery("FROM Stop s WHERE s.name LIKE :name", Stop.class)
                                 .setParameter("name", name + "%")
                                 .list();

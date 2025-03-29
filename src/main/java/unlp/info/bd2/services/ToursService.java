@@ -8,6 +8,7 @@ import java.util.Optional;
 
 public interface ToursService {
 
+    //IVY
     User createUser(String username, String password, String fullName, String email, Date birthdate, String phoneNumber) throws ToursException;
     DriverUser createDriverUser(String username, String password, String fullName, String email, Date birthdate, String phoneNumber, String expedient) throws ToursException;
     TourGuideUser createTourGuideUser(String username, String password, String fullName, String email, Date birthdate, String phoneNumber, String education) throws ToursException;
@@ -16,7 +17,9 @@ public interface ToursService {
     User updateUser(User user) throws ToursException;
     void deleteUser(User user) throws ToursException;
     Stop createStop(String name, String description) throws ToursException;
-    List<Stop> getStopByNameStart(String name);
+    List<Stop> getStopByNameStart(String name) throws ToursException;
+
+    //FABRI
     Route createRoute(String name, float price, float totalKm, int maxNumberOfUsers, List<Stop> stops) throws ToursException;
     Optional<Route> getRouteById(Long id);
     List<Route> getRoutesBelowPrice(float price);
@@ -25,6 +28,8 @@ public interface ToursService {
     Supplier createSupplier(String businessName, String authorizationNumber) throws ToursException;
     Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException;
     Service updateServicePriceById(Long id, float newPrice) throws ToursException;
+    
+    //FRANCO
     Optional<Supplier> getSupplierById(Long id);
     Optional<Supplier> getSupplierByAuthorizationNumber(String authorizationNumber);
     Optional<Service> getServiceByNameAndSupplierId(String name, Long id) throws ToursException;

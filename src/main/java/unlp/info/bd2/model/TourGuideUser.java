@@ -1,5 +1,6 @@
 package unlp.info.bd2.model;
 
+import java.util.Date;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -21,4 +22,10 @@ public class TourGuideUser extends User {
 
     @ManyToMany(mappedBy = "tourGuideList", cascade = {CascadeType.REFRESH, CascadeType.DETACH})
     private List<Route> routes;
+
+    public TourGuideUser(String username, String password, String name, String email, Date birthdate,
+            String phoneNumber, String education) {
+        super(username, password, name, email, birthdate, phoneNumber);
+        this.education = education;
+    }
 }

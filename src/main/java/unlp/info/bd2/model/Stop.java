@@ -29,4 +29,9 @@ public class Stop {
 
     @ManyToMany(mappedBy = "stops", cascade = {CascadeType.DETACH, CascadeType.REFRESH})
     private List<Route> routes;
+
+    public Stop(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 }
