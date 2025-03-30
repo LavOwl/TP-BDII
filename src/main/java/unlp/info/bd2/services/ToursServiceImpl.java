@@ -95,15 +95,32 @@ public class ToursServiceImpl implements ToursService {
     public Review addReviewToPurchase(int rating, String comment, Purchase purchase) throws ToursException{return null;}
 
     // CONSULTAS HQL
-    public List<Purchase> getAllPurchasesOfUsername(String username){return null;}
-    public List<User> getUserSpendingMoreThan(float mount){return null;}
-    public List<Supplier> getTopNSuppliersInPurchases(int n){return null;}
-    public List<Purchase> getTop10MoreExpensivePurchasesInServices(){return null;}
+
+    //IVY
+    public List<Purchase> getAllPurchasesOfUsername(String username){
+        return toursRepository.getAllPurchasesOfUsername(username);
+    }
+
+    public List<User> getUserSpendingMoreThan(float mount){
+        return toursRepository.getUserSpendingMoreThan(mount);
+    }
+
+    public List<Supplier> getTopNSuppliersInPurchases(int n){
+        return toursRepository.getTopNSuppliersInPurchases(n);
+    }
+
+    public List<Purchase> getTop10MoreExpensivePurchasesInServices(){
+        return toursRepository.getTop10MoreExpensivePurchasesInServices();
+    }
+    
+    //FABRI
     public List<User> getTop5UsersMorePurchases(){return null;}
     public long getCountOfPurchasesBetweenDates(Date start, Date end){return 0;}
     public List<Route> getRoutesWithStop(Stop stop){return null;}
     public Long getMaxStopOfRoutes(){return null;}
     public List<Route> getRoutsNotSell(){return null;}
+    
+    //FRANCO
     public List<Route> getTop3RoutesWithMaxRating(){return null;}
     public Service getMostDemandedService(){return null;}
     public List<Service> getServiceNoAddedToPurchases(){return null;}

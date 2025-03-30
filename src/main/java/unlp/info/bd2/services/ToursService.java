@@ -41,15 +41,21 @@ public interface ToursService {
     Review addReviewToPurchase(int rating, String comment, Purchase purchase) throws ToursException;
 
     // CONSULTAS HQL
+
+    //IVY
     List<Purchase> getAllPurchasesOfUsername(String username);
     List<User> getUserSpendingMoreThan(float mount);
     List<Supplier> getTopNSuppliersInPurchases(int n);
     List<Purchase> getTop10MoreExpensivePurchasesInServices();
+
+    //FABRI
     List<User> getTop5UsersMorePurchases();
     long getCountOfPurchasesBetweenDates(Date start, Date end);
     List<Route> getRoutesWithStop(Stop stop);
     Long getMaxStopOfRoutes();
     List<Route> getRoutsNotSell();
+
+    //FRANCO
     List<Route> getTop3RoutesWithMaxRating();
     Service getMostDemandedService();
     List<Service> getServiceNoAddedToPurchases();

@@ -145,4 +145,50 @@ public class ToursRepositoryImpl implements ToursRepository {
     public Optional<Purchase> getPurchaseByCode(String code){return null;}
     public void deletePurchase(Purchase purchase) throws ToursException{}
     public Review addReviewToPurchase(int rating, String comment, Purchase purchase) throws ToursException{return null;}
+
+
+    //HQL SENTENCES
+
+    //IVY
+    public List<Purchase> getAllPurchasesOfUsername(String username){
+        Session session = sessionFactory.openSession();
+        List<Purchase> purchases = session.createQuery("SELECT p FROM Purchase p JOIN p.user u WHERE u.username = :username", Purchase.class)
+                    .setParameter("username", username)
+                    .list();
+        session.close();
+        return purchases;
+    }
+
+    public List<User> getUserSpendingMoreThan(float amount){
+        Session session = sessionFactory.openSession();
+        List<User> users = session.createQuery("SELECT u FROM Purchase p JOIN p.user u GROUP BY u.id HAVING SUM(p.totalPrice) > :amount", User.class)
+                    .setParameter("amount", amount)
+                    .list();
+        session.close();
+        return users;
+    }
+    
+    public List<Supplier> getTopNSuppliersInPurchases(int n){
+        Session session = sessionFactory.openSession();
+        List<Supplier> suppliers = session.createQuery("SELECT s FROM ItemService is JOIN is.service serv JOIN serv.supplier s GROUP BY s.id ORDER BY COUNT(is) DESC", Supplier.class)
+                    .setMaxResults(n)
+                    .list();
+        session.close();
+        return suppliers;
+    }
+    
+    public List<Purchase> getTop10MoreExpensivePurchasesInServices(){
+        //Criteria isn't clear
+        Session session = sessionFactory.openSession();
+        List<Purchase> purchases = session.createQuery("SELECT p FROM Purchase p ORDER BY p.totalPrice DESC", Purchase.class)
+                    .setMaxResults(10)
+                    .list();
+        session.close();
+        return purchases;
+    }
+
+    //FABRI
+
+    //FRANCO
+
 }
