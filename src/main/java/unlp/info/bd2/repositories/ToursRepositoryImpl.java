@@ -10,6 +10,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import jakarta.persistence.PersistenceException;
 import unlp.info.bd2.model.ItemService;
 import unlp.info.bd2.model.Purchase;
 import unlp.info.bd2.model.Review;
@@ -26,7 +27,7 @@ public class ToursRepositoryImpl implements ToursRepository {
     private SessionFactory sessionFactory;
 
     //IVY
-    public void saveOrUpdateUser(User user) throws ToursException{
+    public User saveOrUpdateUser(User user) throws ToursException{
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
 
@@ -34,11 +35,13 @@ public class ToursRepositoryImpl implements ToursRepository {
                         .setParameter("username", user.getUsername())
                         .uniqueResult();
 
-        if (Objects.isNull(session.find(User.class, user.getId()))) {
+        if (user.getId() == null || Objects.isNull(session.find(User.class, user.getId()))) {
             if(sameUsernameUser == null){
                 session.persist(user);
             }
             else{
+                transaction.commit();
+                session.close();
                 throw new ToursException("Tried to store repeated username");
             }
         } else {
@@ -46,11 +49,14 @@ public class ToursRepositoryImpl implements ToursRepository {
                 session.merge(user);
             }
             else{
+                transaction.commit();
+                session.close();
                 throw new ToursException("Tried to store repeated username");
             }
         }
         transaction.commit();
         session.close();
+        return user;
     }
 
     public Optional<User> getUserById(Long id) { //Removed "throws TourException"; it doesn't make sense
@@ -71,10 +77,22 @@ public class ToursRepositoryImpl implements ToursRepository {
     public void deleteUser(Long id) throws ToursException{
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-
         User user = session.get(User.class, id);
         if (user != null) {
-            session.remove(user);
+            if(!user.isActive()){
+                throw new ToursException("El usuario se encuentra desactivado");
+            }
+            try{
+                session.remove(user);
+            }
+            catch(PersistenceException e){
+                session.merge(user);
+                if(e.getCause() instanceof ToursException){
+                    transaction.commit();
+                    session.close();
+                    throw new ToursException(e.getMessage());
+                }
+            }
         }
         else{
             throw new ToursException("Tried to delete non-existent user");
@@ -83,11 +101,11 @@ public class ToursRepositoryImpl implements ToursRepository {
         session.close();
     }
 
-    public void saveOrUpdateStop(Stop stop){
+    public Stop saveOrUpdateStop(Stop stop){
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
 
-        if (Objects.isNull(session.find(Stop.class, stop.getId()))) {
+        if (stop.getId() == null || Objects.isNull(session.find(Stop.class, stop.getId()))) {
             session.persist(stop);
         } else {
             session.merge(stop);
@@ -95,6 +113,7 @@ public class ToursRepositoryImpl implements ToursRepository {
         
         transaction.commit();
         session.close();
+        return stop;
     }
 
     public List<Stop> getStopByNameStart(String name) {

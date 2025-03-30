@@ -28,20 +28,18 @@ public class ToursServiceImpl implements ToursService {
     //IVY
     public User createUser(@NotNull String username, @NotNull String password, @NotNull String fullName, @NotNull String email, @NotNull Date birthdate, @NotNull String phoneNumber) throws ToursException{
         User user = new User(username, password, fullName, email, birthdate, phoneNumber);
-        toursRepository.saveOrUpdateUser(user);
-        return user;
+        return toursRepository.saveOrUpdateUser(user);
     }
 
     public DriverUser createDriverUser(@NotNull String username, @NotNull String password, @NotNull String fullName, @NotNull String email, @NotNull Date birthdate, @NotNull String phoneNumber, @NotNull String expedient) throws ToursException{
         DriverUser user = new DriverUser(username, password, fullName, email, birthdate, phoneNumber, expedient);
-        toursRepository.saveOrUpdateUser(user);
-        return user;
+        return (DriverUser)toursRepository.saveOrUpdateUser(user);
     }
 
     public TourGuideUser createTourGuideUser(@NotNull String username, @NotNull String password, @NotNull String fullName, @NotNull String email, @NotNull Date birthdate, @NotNull String phoneNumber, @NotNull String education) throws ToursException{
         TourGuideUser user = new TourGuideUser(username, password, fullName, email, birthdate, phoneNumber, education);
         toursRepository.saveOrUpdateUser(user);
-        return user;
+        return (TourGuideUser)toursRepository.saveOrUpdateUser(user);
     }
 
     public Optional<User> getUserById(Long id) throws ToursException{
@@ -53,8 +51,7 @@ public class ToursServiceImpl implements ToursService {
     }
 
     public User updateUser(@NotNull User user) throws ToursException{
-        toursRepository.saveOrUpdateUser(user);
-        return user;
+        return toursRepository.saveOrUpdateUser(user);
     }
 
     public void deleteUser(@NotNull User user) throws ToursException{
@@ -66,8 +63,7 @@ public class ToursServiceImpl implements ToursService {
             throw new ToursException("Cannot use '% or '_' in the name of a stop"); //Couldn't find an HQL function to avoid SQL injection, could manually map characters to /wildcard or similar, but would take too much time and effort.
         }
         Stop stop = new Stop(name, description);
-        toursRepository.saveOrUpdateStop(stop);
-        return stop;
+        return toursRepository.saveOrUpdateStop(stop);
     }
 
     public List<Stop> getStopByNameStart(@NotNull String name) throws ToursException {

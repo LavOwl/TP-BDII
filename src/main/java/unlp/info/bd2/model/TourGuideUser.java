@@ -1,5 +1,6 @@
 package unlp.info.bd2.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -8,8 +9,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.PreRemove;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import unlp.info.bd2.utils.ToursException;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -21,11 +24,24 @@ public class TourGuideUser extends User {
     private String education;
 
     @ManyToMany(mappedBy = "tourGuideList", cascade = {CascadeType.REFRESH, CascadeType.DETACH})
-    private List<Route> routes;
+    private List<Route> routes = new ArrayList<Route>();
 
     public TourGuideUser(String username, String password, String name, String email, Date birthdate,
             String phoneNumber, String education) {
         super(username, password, name, email, birthdate, phoneNumber);
         this.education = education;
+    }
+
+    public TourGuideUser(){
+        super();
+    }
+
+    @Override
+    @PreRemove
+    protected void checkForFKReferences() throws ToursException {
+        if((this.routes != null && !this.routes.isEmpty())){
+            throw new ToursException("El usuario no puede ser desactivado");
+        }
+        super.checkForFKReferences();
     }
 }

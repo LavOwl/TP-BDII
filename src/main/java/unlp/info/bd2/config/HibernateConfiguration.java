@@ -29,10 +29,10 @@ public class HibernateConfiguration {
     @Bean
     public DataSource dataSource() {
         BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://localhost:3306/bd2_tours_" + this.getGroupNumber() +"?createDatabaseIfNotExist=true&useSSL=false&useTimezone=true&serverTimezone=UTC");
+        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        dataSource.setUrl("jdbc:mysql://localhost:3306/bd2_tours_" + this.getGroupNumber() +"?createDatabaseIfNotExist=true&useSSL=false&useTimezone=true&serverTimezone=UTC&allowPublicKeyRetrieval=true");
         dataSource.setUsername("root");
-        dataSource.setPassword("root");
+        dataSource.setPassword("bd1_root");
         return dataSource;
     }
 

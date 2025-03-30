@@ -1,0 +1,122 @@
+-------------------------------------------------------------------------------
+Test set: unlp.info.bd2.ToursApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 10, Failures: 2, Errors: 8, Skipped: 0, Time elapsed: 8.174 s <<< FAILURE! -- in unlp.info.bd2.ToursApplicationTests
+unlp.info.bd2.ToursApplicationTests.addReviewToPurchaseTest -- Time elapsed: 1.531 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "java.util.Optional.isPresent()" because "optionalPurchase" is null
+	at unlp.info.bd2.ToursApplicationTests.addReviewToPurchaseTest(ToursApplicationTests.java:286)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+unlp.info.bd2.ToursApplicationTests.createAndGetUserTest -- Time elapsed: 0.071 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <true> but was: <false>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:63)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:36)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:31)
+	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:183)
+	at unlp.info.bd2.ToursApplicationTests.createAndGetUserTest(ToursApplicationTests.java:66)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+unlp.info.bd2.ToursApplicationTests.assignWorkersToRoutesTest -- Time elapsed: 0.040 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "unlp.info.bd2.model.Route.getId()" because "route1" is null
+	at unlp.info.bd2.ToursApplicationTests.assignWorkersToRoutesTest(ToursApplicationTests.java:155)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+unlp.info.bd2.ToursApplicationTests.createAndGetPurchaseTest -- Time elapsed: 0.026 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "unlp.info.bd2.model.Purchase.getId()" because "purchase1" is null
+	at unlp.info.bd2.ToursApplicationTests.createAndGetPurchaseTest(ToursApplicationTests.java:229)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+unlp.info.bd2.ToursApplicationTests.removePurchaseAndItems -- Time elapsed: 0.027 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "unlp.info.bd2.model.Service.getItemServiceList()" because "service1" is null
+	at unlp.info.bd2.ToursApplicationTests.removePurchaseAndItems(ToursApplicationTests.java:267)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+unlp.info.bd2.ToursApplicationTests.createAndGetRoutesAndStopsTest -- Time elapsed: 0.047 s <<< ERROR!
+org.hibernate.InstantiationException: No default constructor for entity 'unlp.info.bd2.model.Stop'
+	at org.hibernate.metamodel.internal.EntityInstantiatorPojoStandard.instantiate(EntityInstantiatorPojoStandard.java:93)
+	at org.hibernate.persister.entity.AbstractEntityPersister.instantiate(AbstractEntityPersister.java:4586)
+	at org.hibernate.internal.SessionImpl.instantiate(SessionImpl.java:1463)
+	at org.hibernate.sql.results.graph.entity.AbstractEntityInitializer.instantiateEntity(AbstractEntityInitializer.java:691)
+	at org.hibernate.sql.results.graph.entity.AbstractEntityInitializer.resolveEntityInstance(AbstractEntityInitializer.java:684)
+	at org.hibernate.sql.results.graph.entity.AbstractEntityInitializer.resolveInstance(AbstractEntityInitializer.java:650)
+	at org.hibernate.sql.results.graph.entity.AbstractEntityInitializer.resolveEntityInstance(AbstractEntityInitializer.java:568)
+	at org.hibernate.sql.results.graph.entity.AbstractEntityInitializer.resolveInstance(AbstractEntityInitializer.java:403)
+	at org.hibernate.sql.results.internal.InitializersList.resolveInstances(InitializersList.java:88)
+	at org.hibernate.sql.results.internal.StandardRowReader.coordinateInitializers(StandardRowReader.java:108)
+	at org.hibernate.sql.results.internal.StandardRowReader.readRow(StandardRowReader.java:86)
+	at org.hibernate.sql.results.spi.ListResultsConsumer.consume(ListResultsConsumer.java:203)
+	at org.hibernate.sql.results.spi.ListResultsConsumer.consume(ListResultsConsumer.java:33)
+	at org.hibernate.sql.exec.internal.JdbcSelectExecutorStandardImpl.doExecuteQuery(JdbcSelectExecutorStandardImpl.java:209)
+	at org.hibernate.sql.exec.internal.JdbcSelectExecutorStandardImpl.executeQuery(JdbcSelectExecutorStandardImpl.java:83)
+	at org.hibernate.sql.exec.spi.JdbcSelectExecutor.list(JdbcSelectExecutor.java:76)
+	at org.hibernate.sql.exec.spi.JdbcSelectExecutor.list(JdbcSelectExecutor.java:65)
+	at org.hibernate.query.sqm.internal.ConcreteSqmSelectQueryPlan.lambda$new$2(ConcreteSqmSelectQueryPlan.java:137)
+	at org.hibernate.query.sqm.internal.ConcreteSqmSelectQueryPlan.withCacheableSqmInterpretation(ConcreteSqmSelectQueryPlan.java:362)
+	at org.hibernate.query.sqm.internal.ConcreteSqmSelectQueryPlan.performList(ConcreteSqmSelectQueryPlan.java:303)
+	at org.hibernate.query.sqm.internal.QuerySqmImpl.doList(QuerySqmImpl.java:509)
+	at org.hibernate.query.spi.AbstractSelectionQuery.list(AbstractSelectionQuery.java:427)
+	at unlp.info.bd2.repositories.ToursRepositoryImpl.getStopByNameStart(ToursRepositoryImpl.java:106)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:351)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:213)
+	at jdk.proxy2/jdk.proxy2.$Proxy80.getStopByNameStart(Unknown Source)
+	at unlp.info.bd2.services.ToursServiceImpl.getStopByNameStart(ToursServiceImpl.java:77)
+	at unlp.info.bd2.ToursApplicationTests.createAndGetRoutesAndStopsTest(ToursApplicationTests.java:117)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+unlp.info.bd2.ToursApplicationTests.createAndGetSupplierAndService -- Time elapsed: 0.007 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "unlp.info.bd2.model.Supplier.getId()" because "supplier1" is null
+	at unlp.info.bd2.ToursApplicationTests.createAndGetSupplierAndService(ToursApplicationTests.java:172)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+unlp.info.bd2.ToursApplicationTests.updateUserTest -- Time elapsed: 0.070 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <true> but was: <false>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:63)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:36)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:31)
+	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:183)
+	at unlp.info.bd2.ToursApplicationTests.updateUserTest(ToursApplicationTests.java:105)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+unlp.info.bd2.ToursApplicationTests.deleteUserTest -- Time elapsed: 0.023 s <<< ERROR!
+unlp.info.bd2.utils.ToursException: Tried to delete non-existent user
+	at unlp.info.bd2.repositories.ToursRepositoryImpl.deleteUser(ToursRepositoryImpl.java:82)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:351)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:213)
+	at jdk.proxy2/jdk.proxy2.$Proxy80.deleteUser(Unknown Source)
+	at unlp.info.bd2.services.ToursServiceImpl.deleteUser(ToursServiceImpl.java:61)
+	at unlp.info.bd2.ToursApplicationTests.deleteUserTest(ToursApplicationTests.java:298)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+unlp.info.bd2.ToursApplicationTests.updateServicePriceTest -- Time elapsed: 0.006 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "unlp.info.bd2.model.Service.getPrice()" because "service1" is null
+	at unlp.info.bd2.ToursApplicationTests.updateServicePriceTest(ToursApplicationTests.java:207)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+

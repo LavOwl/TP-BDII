@@ -1,5 +1,6 @@
 package unlp.info.bd2.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -28,7 +29,7 @@ public class Stop {
     private String description;
 
     @ManyToMany(mappedBy = "stops", cascade = {CascadeType.DETACH, CascadeType.REFRESH})
-    private List<Route> routes;
+    private List<Route> routes = new ArrayList<Route>();
 
     public Stop(String name, String description) {
         this.name = name;

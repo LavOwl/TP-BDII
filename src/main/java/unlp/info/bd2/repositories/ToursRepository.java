@@ -10,7 +10,7 @@ import unlp.info.bd2.utils.ToursException;
 public interface ToursRepository {
     
     //IVY
-    public void saveOrUpdateUser(User user) throws ToursException;
+    public User saveOrUpdateUser(User user) throws ToursException;
 
     public Optional<User> getUserById(Long id);
 
@@ -18,7 +18,7 @@ public interface ToursRepository {
 
     public void deleteUser(Long id) throws ToursException;
 
-    public void saveOrUpdateStop(Stop stop);
+    public Stop saveOrUpdateStop(Stop stop);
 
     public List<Stop> getStopByNameStart(String name);
 
