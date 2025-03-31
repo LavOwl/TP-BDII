@@ -51,12 +51,38 @@ public class Route {
     @OneToMany(mappedBy = "route", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Purchase> purchases;
 
+    public Route (String name, float price, float totalKm, int maxNumberUsers, List<Stop> stops) {
+        this.name = name;
+        this.price = price;
+        this.totalKm = totalKm;
+        this.maxNumberUsers = maxNumberUsers;
+        this.stops = stops;
+    }
+
     public void addDriver(DriverUser driver){
-        //Implement
+        //modifique aca
+
+
+        // Check if the driver is already in the list to avoid duplicates
+        if (this.driverList.contains(driver)) {
+            return;
+        }
+        // Add the driver to the list and set the route reference in the driver
+        this.driverList.add(driver);
+
+        //hasta aca la modificacion
     }
 
     public void addTourGuide(TourGuideUser tourGuide){
-        //Implement
-    }
+        //modifique aca
 
+        // Check if the tour guide is already in the list to avoid duplicates
+        if (this.tourGuideList.contains(tourGuide)) {
+            return;
+        }
+        // Add the tour guide to the list and set the route reference in the tour guide
+        this.tourGuideList.add(tourGuide);
+        
+        //hasta aca la modificacion
+    }
 }

@@ -74,9 +74,15 @@ public class ToursServiceImpl implements ToursService {
     }
     
     //FABRI
-    public Route createRoute(String name, float price, float totalKm, int maxNumberOfUsers, List<Stop> stops) throws ToursException{return null;}
-    public Optional<Route> getRouteById(Long id){return null;}
-    public List<Route> getRoutesBelowPrice(float price){return null;}
+    public Route createRoute(String name, float price, float totalKm, int maxNumberOfUsers, List<Stop> stops) throws ToursException{
+        Route route = new Route(name, price, totalKm, maxNumberOfUsers, stops);
+        return toursRepository.saveOrUpdateRoute(route);
+    }
+    public Optional<Route> getRouteById(Long id){
+        return null; //a que objeto deberia preguntarle para que busque el id de route ? a route o a purchase?
+    }
+    public List<Route> getRoutesBelowPrice(float price){
+        return null;}
     public void assignDriverByUsername(String username, Long idRoute) throws ToursException{}
     public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException{}
     public Supplier createSupplier(String businessName, String authorizationNumber) throws ToursException{return null;}

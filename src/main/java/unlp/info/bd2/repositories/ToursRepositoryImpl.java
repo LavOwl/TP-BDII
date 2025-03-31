@@ -126,7 +126,15 @@ public class ToursRepositoryImpl implements ToursRepository {
     }
     
     //FABRI
-    public Route createRoute(String name, float price, float totalKm, int maxNumberOfUsers, List<Stop> stops) throws ToursException{return null;}
+    public Route createRoute(String name, float price, float totalKm, int maxNumberOfUsers, List<Stop> stops) throws ToursException{
+        Route route = new Route(name, price, totalKm, maxNumberOfUsers, stops); //asumo que pueden existir 2 rutas con mismos parametros de creacion
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.persist(route);
+        transaction.commit();
+        session.close();
+        return route;
+    }
     public Optional<Route> getRouteById(Long id){return null;}
     public List<Route> getRoutesBelowPrice(float price){return null;}
     public void assignDriverByUsername(String username, Long idRoute) throws ToursException{}

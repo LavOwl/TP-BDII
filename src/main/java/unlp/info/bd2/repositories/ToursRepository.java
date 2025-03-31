@@ -9,6 +9,8 @@ import unlp.info.bd2.model.Supplier;
 import unlp.info.bd2.model.User;
 import unlp.info.bd2.utils.ToursException;
 
+import unlp.info.bd2.model.Route;
+
 public interface ToursRepository {
     
     //IVY
@@ -25,6 +27,10 @@ public interface ToursRepository {
     public List<Stop> getStopByNameStart(String name);
 
     //FABRI
+
+    public Route saveOrUpdateRoute(Route route) throws ToursException;
+
+    public Optional<Route> getRouteById(Long id) throws ToursException;
 
 
     //FRANCO
