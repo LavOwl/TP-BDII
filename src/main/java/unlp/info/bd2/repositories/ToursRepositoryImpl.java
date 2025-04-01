@@ -19,6 +19,8 @@ import unlp.info.bd2.model.Service;
 import unlp.info.bd2.model.Stop;
 import unlp.info.bd2.model.Supplier;
 import unlp.info.bd2.model.User;
+import unlp.info.bd2.model.DriverUser;
+import unlp.info.bd2.model.TourGuideUser;
 import unlp.info.bd2.utils.ToursException;
 
 public class ToursRepositoryImpl implements ToursRepository {
@@ -126,22 +128,166 @@ public class ToursRepositoryImpl implements ToursRepository {
     }
     
     //FABRI
-    public Route createRoute(String name, float price, float totalKm, int maxNumberOfUsers, List<Stop> stops) throws ToursException{
-        Route route = new Route(name, price, totalKm, maxNumberOfUsers, stops); //asumo que pueden existir 2 rutas con mismos parametros de creacion
+    public Route saveOrUpdateRoute(Route route) throws ToursException{
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-        session.persist(route);
+
+        if (route.getId() == null || Objects.isNull(session.find(Route.class, route.getId()))) {
+            session.persist(route);
+        } else {
+            session.merge(route);
+        }
+        
         transaction.commit();
         session.close();
         return route;
     }
-    public Optional<Route> getRouteById(Long id){return null;}
-    public List<Route> getRoutesBelowPrice(float price){return null;}
-    public void assignDriverByUsername(String username, Long idRoute) throws ToursException{}
-    public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException{}
-    public Supplier createSupplier(String businessName, String authorizationNumber) throws ToursException{return null;}
-    public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException{return null;}
-    public Service updateServicePriceById(Long id, float newPrice) throws ToursException{return null;}
+    public Optional<Route> getRouteById(Long id){
+        Session session = sessionFactory.openSession();
+        Route route = session.find(Route.class, id);
+        session.close();
+        return Optional.ofNullable(route);
+    }
+    public List<Route> getRoutesBelowPrice(float price){
+        Session session = sessionFactory.openSession();
+        List<Route> routes = session.createQuery("FROM Route r WHERE r.price < :price", Route.class)
+                                .setParameter("price", price)
+                                .list();
+        session.close();
+        return routes;
+     }
+    public void assignDriverByUsername(String username, Long idRoute) throws ToursException{
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        DriverUser driver = session.createQuery("FROM DriverUser d WHERE d.username = :username", DriverUser.class)
+                                .setParameter("username", username)
+                                .uniqueResult();
+        Route route = session.find(Route.class, idRoute);
+        if (driver == null) {
+            transaction.commit();
+            session.close();
+            throw new ToursException("Tried to assign non-existent driver");
+        }
+        if (route == null) {
+            transaction.commit();
+            session.close();
+            throw new ToursException("Tried to assign driver to non-existent route");
+        }
+        if (route.getDriverList().contains(driver)) {
+            transaction.commit();
+            session.close();
+            throw new ToursException("Driver already assigned to route");
+        }
+        route.addDriver(driver);
+        driver.addRoute(route);
+        //session.merge(driver); // Son necesarios estos merge?
+        //session.merge(route); // 
+        transaction.commit();
+        session.close();
+    }
+    public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException{
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        TourGuideUser tourGuide = session.createQuery("FROM TourGuideUser t WHERE t.username = :username", TourGuideUser.class)
+                                .setParameter("username", username)
+                                .uniqueResult();
+        Route route = session.find(Route.class, idRoute);
+        if (tourGuide == null) {
+            transaction.commit();
+            session.close();
+            throw new ToursException("Tried to assign non-existent tour guide");
+        }
+        if (route == null) {
+            transaction.commit();
+            session.close();
+            throw new ToursException("Tried to assign tour guide to non-existent route");
+        }
+        if (route.getTourGuideList().contains(tourGuide)) {
+            transaction.commit();
+            session.close();
+            throw new ToursException("Tour guide already assigned to route");
+        }
+        route.addTourGuide(tourGuide);
+        tourGuide.addRoute(route);
+        transaction.commit();
+        session.close();
+    }
+    public Supplier createSupplier(String businessName, String authorizationNumber) throws ToursException{
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        if ( authorizationNumber == null || businessName == null){
+            transaction.commit();
+            session.close();
+            throw new ToursException("Cannot use null in the name or authorization number of a supplier"); 
+        }
+        /* 
+        Supplier sameAuthorizationNumberSupplier = session.createQuery("FROM Supplier s WHERE s.authorizationNumber = :authorizationNumber", Supplier.class)
+                                .setParameter("authorizationNumber", authorizationNumber)
+                                .uniqueResult();
+        if (sameAuthorizationNumberSupplier != null) {
+            transaction.commit();
+            session.close();
+            throw new ToursException("Tried to store repeated authorization number");
+        }
+            si el numero de autorizacion no se puede repetir va esto
+        */
+        Supplier supplier = session.createQuery("INSERT INTO Supplier (businessName, authorizationNumber) VALUES (:businessName, :authorizationNumber)", Supplier.class)
+                                .setParameter("businessName", businessName)
+                                .setParameter("authorizationNumber", authorizationNumber)
+                                .uniqueResult();
+        transaction.commit();
+        session.close();
+        return supplier;
+    }
+
+    public Supplier saveOrUpdateSupplier(Supplier supplier) throws ToursException{
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        if (supplier.getId() == null || Objects.isNull(session.find(Supplier.class, supplier.getId()))) {
+            session.persist(supplier);
+        } else {
+            session.merge(supplier);
+        }
+        transaction.commit();
+        session.close();
+        return supplier;
+    }
+
+    public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException{
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        if (supplier == null) {
+            transaction.commit();
+            session.close();
+            throw new ToursException("Tried to add service to non-existent supplier");
+        }
+        if (name == null || description == null) {
+            transaction.commit();
+            session.close();
+            throw new ToursException("Cannot use null in the name or description of a service"); 
+        }
+        Service service = new Service(name, price, description, supplier);
+        session.persist(service);
+        supplier.addService(service);
+        transaction.commit();
+        session.close();
+        return service;
+    }
+    public Service updateServicePriceById(Long id, float newPrice) throws ToursException{
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        Service service = session.find(Service.class, id);
+        if (service == null) {
+            transaction.commit();
+            session.close();
+            throw new ToursException("Tried to update non-existent service");
+        }
+        service.setPrice(newPrice);
+        session.merge(service);
+        transaction.commit();
+        session.close();
+        return service;
+    }
     
     //FRANCO
     public Optional<Supplier> getSupplierById(Long id){return null;}
@@ -196,6 +342,8 @@ public class ToursRepositoryImpl implements ToursRepository {
     }
 
     //FABRI
+
+    
 
     //FRANCO
 

@@ -78,16 +78,37 @@ public class ToursServiceImpl implements ToursService {
         Route route = new Route(name, price, totalKm, maxNumberOfUsers, stops);
         return toursRepository.saveOrUpdateRoute(route);
     }
-    public Optional<Route> getRouteById(Long id){
-        return null; //a que objeto deberia preguntarle para que busque el id de route ? a route o a purchase?
+    public Optional<Route> getRouteById(Long id) {
+        return toursRepository.getRouteById(id);
     }
-    public List<Route> getRoutesBelowPrice(float price){
-        return null;}
-    public void assignDriverByUsername(String username, Long idRoute) throws ToursException{}
-    public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException{}
-    public Supplier createSupplier(String businessName, String authorizationNumber) throws ToursException{return null;}
-    public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException{return null;}
-    public Service updateServicePriceById(Long id, float newPrice) throws ToursException{return null;}
+    public List<Route> getRoutesBelowPrice(float price){ // deberia chequear que no me entre como parametro un precio negativo? y que sean numeros?       
+        return toursRepository.getRoutesBelowPrice(price);
+    }
+    public void assignDriverByUsername(String username, Long idRoute) throws ToursException{
+        toursRepository.assignDriverByUsername(username, idRoute);
+    }
+    public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException{
+        toursRepository.assignTourGuideByUsername(username, idRoute);
+    }
+    public Supplier createSupplier(String businessName, String authorizationNumber) throws ToursException{
+        if(businessName.contains("_") || businessName.contains("%")){
+            throw new ToursException("Cannot use '% or '_' in the name of a supplier"); //Couldn't find an HQL function to avoid SQL injection, could manually map characters to /wildcard or similar, but would take too much time and effort.
+        }
+        Supplier supplier = new Supplier(businessName, authorizationNumber);
+        return toursRepository.saveOrUpdateSupplier(supplier);
+    }
+    public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException{
+        if(name.contains("_") || name.contains("%")){
+            throw new ToursException("Cannot use '% or '_' in the name of a service"); //Couldn't find an HQL function to avoid SQL injection, could manually map characters to /wildcard or similar, but would take too much time and effort.
+        }
+        if(description.contains("_") || description.contains("%")){
+            throw new ToursException("Cannot use '% or '_' in the description of a service"); //Couldn't find an HQL function to avoid SQL injection, could manually map characters to /wildcard or similar, but would take too much time and effort.
+        }
+        return toursRepository.addServiceToSupplier(name, price, description, supplier);
+    }
+    public Service updateServicePriceById(Long id, float newPrice) throws ToursException{
+        return toursRepository.updateServicePriceById(id, newPrice);
+    }
     
     //FRANCO
     public Optional<Supplier> getSupplierById(Long id){return null;}

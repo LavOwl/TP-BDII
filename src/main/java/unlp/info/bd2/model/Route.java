@@ -51,6 +51,10 @@ public class Route {
     @OneToMany(mappedBy = "route", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Purchase> purchases;
 
+    public Route() {
+        // Default constructor
+    }
+
     public Route (String name, float price, float totalKm, int maxNumberUsers, List<Stop> stops) {
         this.name = name;
         this.price = price;
@@ -61,7 +65,6 @@ public class Route {
 
     public void addDriver(DriverUser driver){
         //modifique aca
-
 
         // Check if the driver is already in the list to avoid duplicates
         if (this.driverList.contains(driver)) {

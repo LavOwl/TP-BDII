@@ -8,6 +8,7 @@ import unlp.info.bd2.model.Stop;
 import unlp.info.bd2.model.Supplier;
 import unlp.info.bd2.model.User;
 import unlp.info.bd2.utils.ToursException;
+import unlp.info.bd2.model.Service;
 
 import unlp.info.bd2.model.Route;
 
@@ -27,11 +28,21 @@ public interface ToursRepository {
     public List<Stop> getStopByNameStart(String name);
 
     //FABRI
-
     public Route saveOrUpdateRoute(Route route) throws ToursException;
 
-    public Optional<Route> getRouteById(Long id) throws ToursException;
+    public Optional<Route> getRouteById(Long id);
 
+    public List<Route> getRoutesBelowPrice(float price);
+
+    public void assignDriverByUsername(String username, Long idRoute) throws ToursException;
+
+    public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException;
+
+    public Supplier saveOrUpdateSupplier(Supplier supplier) throws ToursException;
+
+    public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException;
+
+    public Service updateServicePriceById(Long id, float newPrice) throws ToursException;
 
     //FRANCO
 

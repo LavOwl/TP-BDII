@@ -37,6 +37,17 @@ public class DriverUser extends User {
         super();
     }
 
+    public DriverUser(String username, String password, String name, String email, Date birthdate, String phoneNumber) {
+        super(username, password, name, email, birthdate, phoneNumber);
+    }
+
+    public void addRoute(Route route) {
+        if (this.routes == null) {
+            this.routes = new ArrayList<Route>();
+        }
+        this.routes.add(route);
+    }
+
     @Override
     @PreRemove
     protected void checkForFKReferences() throws ToursException {

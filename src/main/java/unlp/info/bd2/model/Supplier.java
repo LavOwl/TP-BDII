@@ -30,4 +30,17 @@ public class Supplier {
 
     @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Service> services;
+
+    public Supplier() {
+        // Default constructor
+    }
+
+    public Supplier(String businessName, String authorizationNumber) {
+        this.businessName = businessName;
+        this.authorizationNumber = authorizationNumber;
+    }
+
+    public void addService(Service service) {
+        this.services.add(service);
+    }
 }
