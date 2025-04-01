@@ -141,11 +141,21 @@ public class ToursServiceImpl implements ToursService {
     }
     
     //FABRI
-    public List<User> getTop5UsersMorePurchases(){return null;}
-    public long getCountOfPurchasesBetweenDates(Date start, Date end){return 0;}
-    public List<Route> getRoutesWithStop(Stop stop){return null;}
-    public Long getMaxStopOfRoutes(){return null;}
-    public List<Route> getRoutsNotSell(){return null;}
+    public List<User> getTop5UsersMorePurchases(){
+        return toursRepository.getTop5UsersMorePurchases();
+    }
+    public long getCountOfPurchasesBetweenDates(Date start, Date end){
+        return toursRepository.getCountOfPurchasesBetweenDates(start, end);
+    }
+    public List<Route> getRoutesWithStop(Stop stop){
+        return toursRepository.getRoutesWithStop(stop);
+    }
+    public Long getMaxStopOfRoutes(){
+        return toursRepository.getMaxStopOfRoutes();
+    }
+    public List<Route> getRoutsNotSell(){
+        return toursRepository.getRoutsNotSell();
+    }
     
     //FRANCO
     public List<Route> getTop3RoutesWithMaxRating(){return null;}

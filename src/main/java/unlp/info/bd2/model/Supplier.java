@@ -1,5 +1,6 @@
 package unlp.info.bd2.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -29,7 +30,7 @@ public class Supplier {
     private String authorizationNumber;
 
     @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Service> services;
+    private List<Service> services = new ArrayList<>();
 
     public Supplier() {
         // Default constructor
@@ -41,10 +42,6 @@ public class Supplier {
     }
 
     public void addService(Service service) {
-        if (service != null) {
-            service.setSupplier(this);
-        }else {
-            this.services.add(service);
-        }
+        services.add(service);
     }
 }

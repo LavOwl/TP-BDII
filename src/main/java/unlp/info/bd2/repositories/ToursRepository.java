@@ -1,5 +1,6 @@
 package unlp.info.bd2.repositories;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,6 +44,17 @@ public interface ToursRepository {
     public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException;
 
     public Service updateServicePriceById(Long id, float newPrice) throws ToursException;
+
+    public List<User> getTop5UsersMorePurchases();
+    
+    public long getCountOfPurchasesBetweenDates(Date start, Date end);
+
+    public List<Route> getRoutesWithStop(Stop stop);
+
+    public Long getMaxStopOfRoutes();
+
+    public List<Route> getRoutsNotSell();
+
 
     //FRANCO
 

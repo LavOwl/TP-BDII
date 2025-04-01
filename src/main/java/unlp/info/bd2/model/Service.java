@@ -1,5 +1,6 @@
 package unlp.info.bd2.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -33,7 +34,7 @@ public class Service {
     private String description;
 
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ItemService> itemServiceList;
+    private List<ItemService> itemServiceList = new ArrayList<>();
 
     @ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.DETACH})
     @JoinColumn(name = "supplier_id", referencedColumnName = "id", nullable = false)

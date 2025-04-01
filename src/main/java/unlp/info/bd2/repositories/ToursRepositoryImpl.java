@@ -129,21 +129,16 @@ public class ToursRepositoryImpl implements ToursRepository {
     
     //FABRI
     public Route saveOrUpdateRoute(Route route) throws ToursException {
-        try {
-            Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
-    
-            if (route.getId() == null || Objects.isNull(session.find(Route.class, route.getId()))) {
-                session.persist(route);
-            } else {
-                session.merge(route);
-            }
-            transaction.commit();
-            session.close();
-            return route;
-        } catch (PersistenceException e) {
-            throw new ToursException("Error saving or updating route: ");
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        if (route.getId() == null || Objects.isNull(session.find(Route.class, route.getId()))) {
+            session.persist(route);
+        } else {
+            session.merge(route);
         }
+        transaction.commit();
+        session.close();
+        return route;
     }
     
     public Optional<Route> getRouteById(Long id){
@@ -348,6 +343,15 @@ public class ToursRepositoryImpl implements ToursRepository {
 
     //FABRI
 
+    public List<User> getTop5UsersMorePurchases(){
+        Session session = sessionFactory.openSession();
+        List<User> users = session.createQuery("SELECT u FROM Purchase p JOIN p.user u GROUP BY u.id ORDER BY COUNT(p) DESC", User.class)
+                    .setMaxResults(5)
+                    .list();
+        session.close();
+        return users;
+    };
+
     public List<Route> getTop3RoutesWithMoreStops(){
         Session session = sessionFactory.openSession();
         List<Route> routes = session.createQuery("SELECT r FROM Route r JOIN r.stops s GROUP BY r.id ORDER BY COUNT(s) DESC", Route.class)
@@ -357,7 +361,7 @@ public class ToursRepositoryImpl implements ToursRepository {
         return routes;
     };
 
-    public Long getCountOfPurchasesBetweenDates (Date start, Date end){
+    public long getCountOfPurchasesBetweenDates (Date start, Date end){
         Session session = sessionFactory.openSession();
         Long count = session.createQuery("SELECT COUNT(p) FROM Purchase p WHERE p.date BETWEEN :start AND :end", Long.class)
                     .setParameter("start", start)
@@ -401,6 +405,31 @@ public class ToursRepositoryImpl implements ToursRepository {
         return routes;
     };
 
+    public List<Route> getRoutesWithStop(Stop stop){
+        Session session = sessionFactory.openSession();
+        List<Route> routes = session.createQuery("SELECT r FROM Route r JOIN r.stops s WHERE s = :stop", Route.class)
+                    .setParameter("stop", stop)
+                    .list();
+        session.close();
+        return routes;
+    }
+
+    public Long getMaxStopOfRoutes() {
+        Session session = sessionFactory.openSession();
+        
+        Long max = session.createQuery(
+            "SELECT MAX(stopsCount) FROM ( " +
+            "    SELECT r.id AS routeId, COUNT(s) AS stopsCount " +
+            "    FROM Route r LEFT JOIN r.stops s " +
+            "    GROUP BY r.id " +
+            ")",
+            Long.class
+        ).uniqueResult();
+        
+        session.close();
+        return max;
+    }
+    
     //FRANCO
 
 }
