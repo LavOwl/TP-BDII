@@ -128,20 +128,24 @@ public class ToursRepositoryImpl implements ToursRepository {
     }
     
     //FABRI
-    public Route saveOrUpdateRoute(Route route) throws ToursException{
-        Session session = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
-
-        if (route.getId() == null || Objects.isNull(session.find(Route.class, route.getId()))) {
-            session.persist(route);
-        } else {
-            session.merge(route);
+    public Route saveOrUpdateRoute(Route route) throws ToursException {
+        try {
+            Session session = sessionFactory.openSession();
+            Transaction transaction = session.beginTransaction();
+    
+            if (route.getId() == null || Objects.isNull(session.find(Route.class, route.getId()))) {
+                session.persist(route);
+            } else {
+                session.merge(route);
+            }
+            transaction.commit();
+            session.close();
+            return route;
+        } catch (PersistenceException e) {
+            throw new ToursException("Error saving or updating route: ");
         }
-        
-        transaction.commit();
-        session.close();
-        return route;
     }
+    
     public Optional<Route> getRouteById(Long id){
         Session session = sessionFactory.openSession();
         Route route = session.find(Route.class, id);
@@ -267,6 +271,7 @@ public class ToursRepositoryImpl implements ToursRepository {
             throw new ToursException("Cannot use null in the name or description of a service"); 
         }
         Service service = new Service(name, price, description, supplier);
+
         session.persist(service);
         supplier.addService(service);
         transaction.commit();
@@ -343,7 +348,58 @@ public class ToursRepositoryImpl implements ToursRepository {
 
     //FABRI
 
-    
+    public List<Route> getTop3RoutesWithMoreStops(){
+        Session session = sessionFactory.openSession();
+        List<Route> routes = session.createQuery("SELECT r FROM Route r JOIN r.stops s GROUP BY r.id ORDER BY COUNT(s) DESC", Route.class)
+                    .setMaxResults(3)
+                    .list();
+        session.close();
+        return routes;
+    };
+
+    public Long getCountOfPurchasesBetweenDates (Date start, Date end){
+        Session session = sessionFactory.openSession();
+        Long count = session.createQuery("SELECT COUNT(p) FROM Purchase p WHERE p.date BETWEEN :start AND :end", Long.class)
+                    .setParameter("start", start)
+                    .setParameter("end", end)
+                    .uniqueResult();
+        session.close();
+        return count;
+    };
+
+    public List<Purchase> getPurchaseWithService(Service service){
+        Session session = sessionFactory.openSession();
+        List<Purchase> purchases = session.createQuery("SELECT p FROM Purchase p JOIN p.items i WHERE i.service = :service", Purchase.class)
+                    .setParameter("service", service)
+                    .list();
+        session.close();
+        return purchases;
+    };
+
+    public Long getMaxServicesOfSupplier(){
+        Session session = sessionFactory.openSession();
+        Long max = session.createQuery("SELECT MAX(s.services.size) FROM Supplier s", Long.class)
+                    .uniqueResult();
+        session.close();
+        return max;
+    };
+
+    public List<Route> getRoutsNotSell(){
+        Session session = sessionFactory.openSession();
+        List<Route> routes = session.createQuery("SELECT r FROM Route r WHERE r NOT IN (SELECT p.route FROM Purchase p)", Route.class)
+                    .list();
+        session.close();
+        return routes;
+    };
+
+    public List<Route> getTop3RoutesWithMaxAverageRating(){
+        Session session = sessionFactory.openSession();
+        List<Route> routes = session.createQuery("SELECT r FROM Route r JOIN r.reviews rev GROUP BY r.id ORDER BY AVG(rev.rating) DESC", Route.class)
+                    .setMaxResults(3)
+                    .list();
+        session.close();
+        return routes;
+    };
 
     //FRANCO
 

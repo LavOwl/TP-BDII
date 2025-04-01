@@ -41,6 +41,10 @@ public class Supplier {
     }
 
     public void addService(Service service) {
-        this.services.add(service);
+        if (service != null) {
+            service.setSupplier(this);
+        }else {
+            this.services.add(service);
+        }
     }
 }
