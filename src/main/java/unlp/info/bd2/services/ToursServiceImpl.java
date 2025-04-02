@@ -120,29 +120,15 @@ public class ToursServiceImpl implements ToursService {
     }
 
     public Optional<Service> getServiceByNameAndSupplierId (String name, Long id) throws ToursException {
-        if (!this.validateString(name)) {
-            throw new ToursException("The name sent is not valid. It could be: blank, null, too long, or contain '_' or '%'");
-        }
-
-        if (!this.validatesLong(id)) {
-            throw new ToursException("The number sent is not valid. It could be blank or lower than 0");
-        }
-
         return toursRepository.getServiceByNameAndSupplierId(name, id);
     }
     
     public Purchase createPurchase (String code, Route route, User user) throws ToursException {
-        if (!this.validateString(code)) {
-            throw new ToursException("The code sent is not valid. It could be: blank, null, too long, or contain '_' or '%'");
-        }
         Purchase purchase = new Purchase(code, route, user);
         return toursRepository.savePurchase(purchase);
     }
     
     public Purchase createPurchase (String code, Date date, Route route, User user) throws ToursException {
-        if (!this.validateString(code)) {
-            throw new ToursException("The code sent is not valid. It could be: blank, null, too long, or contain '_' or '%'");
-        }
         Purchase purchase = new Purchase(code, date, route, user);
         return toursRepository.savePurchase(purchase);
     }
@@ -197,21 +183,21 @@ public class ToursServiceImpl implements ToursService {
     public List<Service> getServiceNoAddedToPurchases(){return null;}
     public List<TourGuideUser> getTourGuidesWithRating1(){return null;}
 
-
+    // No son necesarios, Spring ya lo hace, con parametrizar bien la consulta funciona
     // Methods to validate data
     /** Validates the String sent to use it in a query */
-    private boolean validateString (String str) {
+    /*private boolean validateString (String str) {
         if (str == null || str.length() > 255 || str.isBlank() || str.contains("_") || str.contains("%")) 
             return false;
     
         return true;
-    }
+    }*/
 
     /** Validates the Long sent to use it in a query */
-    private boolean validatesLong (Long number) {
+    /*private boolean validatesLong (Long number) {
         if (number == null || number < 0)
             return false;
         
-        return true;
-    }
+        return true; 
+    }*/
 }
