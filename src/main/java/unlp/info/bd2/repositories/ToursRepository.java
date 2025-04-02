@@ -71,12 +71,16 @@ public interface ToursRepository {
     /** Save the Purchase sent in the BD */
     public Purchase savePurchase (Purchase purchase) throws ToursException;
     
+    /** Creates and add an ItemService in the Purchase given */
     public ItemService addItemToPurchase (Service service, int quantity, Purchase purchase) throws ToursException;
     
+    /** Returns the Purchase by the code sent */
     public Optional<Purchase> getPurchaseByCode (String code);
     
+    /** Deletes the Purchase given from the DB */
     public void deletePurchase (Purchase purchase) throws ToursException;
     
+    /** Creates and add a Review in the Purchase given */
     public Review addReviewToPurchase (int rating, String comment, Purchase purchase) throws ToursException;
 
     //HQL SENTENCES

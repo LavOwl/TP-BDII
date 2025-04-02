@@ -133,13 +133,25 @@ public class ToursServiceImpl implements ToursService {
         return toursRepository.savePurchase(purchase);
     }
     
-    public ItemService addItemToPurchase (Service service, int quantity, Purchase purchase) throws ToursException {return null;}
+    public ItemService addItemToPurchase (Service service, int quantity, Purchase purchase) throws ToursException {
+        return toursRepository.addItemToPurchase(service, quantity, purchase);
+    }
     
-    public Optional<Purchase> getPurchaseByCode (String code) {return null;}
+    public Optional<Purchase> getPurchaseByCode (String code) {
+        return toursRepository.getPurchaseByCode(code);
+    }
     
-    public void deletePurchase (Purchase purchase) throws ToursException {}
+    public void deletePurchase (Purchase purchase) throws ToursException {
+        toursRepository.deletePurchase(purchase);
+    }
     
-    public Review addReviewToPurchase (int rating, String comment, Purchase purchase) throws ToursException {return null;}
+    public Review addReviewToPurchase (int rating, String comment, Purchase purchase) throws ToursException {
+        //supongo que el rating debe estar entre 0 y 10
+        if (rating < 0 && rating > 10)
+            throw new ToursException("The rating of the review must be between 0 and 10");
+            
+        return toursRepository.addReviewToPurchase(rating, comment, purchase);
+    }
 
     // CONSULTAS HQL
 

@@ -37,8 +37,6 @@ public interface ToursService {
     Optional<Supplier> getSupplierByAuthorizationNumber (String authorizationNumber);
     
     /** Returns the Service that corresponds with his name and her supplier ID if it's exists.<p>
-     * It will trow the Tours Exception if the parameter "name" doesn't follow the rules of a 
-     * proper name.
      */
     Optional<Service> getServiceByNameAndSupplierId (String name, Long id) throws ToursException;
     
@@ -57,12 +55,24 @@ public interface ToursService {
      */
     Purchase createPurchase (String code, Date date, Route route, User user) throws ToursException;
     
+    /** Creates an ItemService and add's it in the given Purchase. Receives:<p>
+     * service -> Service<p>
+     * quantity -> int<p>
+     * purchase -> Purchase<p>
+     */
     ItemService addItemToPurchase (Service service, int quantity, Purchase purchase) throws ToursException;
     
+    /** Returns the Purchase by the code sent */
     Optional<Purchase> getPurchaseByCode (String code);
     
+    /** Deletes the Purchase given from the DB */
     void deletePurchase (Purchase purchase) throws ToursException;
     
+    /** Creates a Review and add's it in the given Purchase. Receives:<p>
+     * rating -> int<p>
+     * comment -> String<p>
+     * purchase -> Purchase<p>
+     */
     Review addReviewToPurchase (int rating, String comment, Purchase purchase) throws ToursException;
 
     // CONSULTAS HQL

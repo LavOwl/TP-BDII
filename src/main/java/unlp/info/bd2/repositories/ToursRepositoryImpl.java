@@ -300,8 +300,8 @@ public class ToursRepositoryImpl implements ToursRepository {
     public Optional<Supplier> getSupplierByAuthorizationNumber(String authorizationNumber) {
         Session session = sessionFactory.openSession();
         Supplier supplier = session.createQuery("FROM Supplier s WHERE s.authorizationNumber = :authorizationNumber", Supplier.class)
-                       .setParameter("authorizationNumber", authorizationNumber)
-                       .uniqueResult();
+                            .setParameter("authorizationNumber", authorizationNumber)
+                            .uniqueResult();
         session.close();
         return Optional.ofNullable(supplier);
     }
@@ -333,13 +333,47 @@ public class ToursRepositoryImpl implements ToursRepository {
         return purchase;
     }
     
-    public ItemService addItemToPurchase(Service service, int quantity, Purchase purchase) throws ToursException {return null;}
+    public ItemService addItemToPurchase(Service service, int quantity, Purchase purchase) throws ToursException {
+        ItemService item = new ItemService(service, quantity, purchase);
+        float price = quantity * service.getPrice();
+        purchase.addItem(item, price);
+
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.persist(item);
+        session.merge(purchase);
+        transaction.commit();
+        session.close();
+        return item;
+    }
     
-    public Optional<Purchase> getPurchaseByCode(String code) {return null;}
+    public Optional<Purchase> getPurchaseByCode(String code) {
+        Session session = sessionFactory.openSession();
+        Optional<Purchase> purchase = (Optional<Purchase>) session.createQuery("FROM Purchase p WHERE p.code = :purchaseCode")
+                            .setParameter("purchaseCode", code)
+                            .uniqueResult();
+        session.close();
+        return purchase;
+    }
     
-    public void deletePurchase(Purchase purchase) throws ToursException {}
+    public void deletePurchase(Purchase purchase) throws ToursException {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.remove(purchase);
+        transaction.commit();
+        session.close();
+    }
     
-    public Review addReviewToPurchase(int rating, String comment, Purchase purchase) throws ToursException {return null;}
+    public Review addReviewToPurchase(int rating, String comment, Purchase purchase) throws ToursException {
+        Review review = purchase.addReview(rating, comment);
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.persist(review);
+        session.merge(purchase);
+        transaction.commit();
+        session.close();
+        return review;
+    }
 
 
     //HQL SENTENCES
