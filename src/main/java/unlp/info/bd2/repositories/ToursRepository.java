@@ -4,7 +4,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import unlp.info.bd2.model.ItemService;
 import unlp.info.bd2.model.Purchase;
+import unlp.info.bd2.model.Review;
 import unlp.info.bd2.model.Stop;
 import unlp.info.bd2.model.Supplier;
 import unlp.info.bd2.model.User;
@@ -57,6 +59,25 @@ public interface ToursRepository {
 
 
     //FRANCO
+    /** Returns the Supplier of the ID sent if it's exists. */
+    public Optional<Supplier> getSupplierById (Long id);
+
+    /** Returns the Supplier of the Authorization Number sent if it's exists. */
+    public Optional<Supplier> getSupplierByAuthorizationNumber (String authorizationNumber);
+
+    /** Returns the Service that corresponds to the name of service and his supplier ID sent if it's exists */
+    public Optional<Service> getServiceByNameAndSupplierId (String name, Long id) throws ToursException;
+
+    /** Save the Purchase sent in the BD */
+    public Purchase savePurchase (Purchase purchase) throws ToursException;
+    
+    public ItemService addItemToPurchase (Service service, int quantity, Purchase purchase) throws ToursException;
+    
+    public Optional<Purchase> getPurchaseByCode (String code);
+    
+    public void deletePurchase (Purchase purchase) throws ToursException;
+    
+    public Review addReviewToPurchase (int rating, String comment, Purchase purchase) throws ToursException;
 
     //HQL SENTENCES
 

@@ -30,15 +30,40 @@ public interface ToursService {
     Service updateServicePriceById(Long id, float newPrice) throws ToursException;
     
     //FRANCO
-    Optional<Supplier> getSupplierById(Long id);
-    Optional<Supplier> getSupplierByAuthorizationNumber(String authorizationNumber);
-    Optional<Service> getServiceByNameAndSupplierId(String name, Long id) throws ToursException;
-    Purchase createPurchase(String code, Route route, User user) throws ToursException;
-    Purchase createPurchase(String code, Date date, Route route, User user) throws ToursException;
-    ItemService addItemToPurchase(Service service, int quantity, Purchase purchase) throws ToursException;
-    Optional<Purchase> getPurchaseByCode(String code);
-    void deletePurchase(Purchase purchase) throws ToursException;
-    Review addReviewToPurchase(int rating, String comment, Purchase purchase) throws ToursException;
+    /** Returns the Supplier of the ID sent if it's exists. */
+    Optional<Supplier> getSupplierById (Long id);
+    
+    /** Returns the Supplier of the Authorization Number sent if it's exists. */
+    Optional<Supplier> getSupplierByAuthorizationNumber (String authorizationNumber);
+    
+    /** Returns the Service that corresponds with his name and her supplier ID if it's exists.<p>
+     * It will trow the Tours Exception if the parameter "name" doesn't follow the rules of a 
+     * proper name.
+     */
+    Optional<Service> getServiceByNameAndSupplierId (String name, Long id) throws ToursException;
+    
+    /** Creates a Purchase by the arguments sent:<p>
+     * code -> String<p>
+     * route -> Route<p>
+     * user -> User<p>
+     */
+    Purchase createPurchase (String code, Route route, User user) throws ToursException;
+    
+    /** Creates a Purchase by the arguments sent:<p>
+     * code -> String<p>
+     * date -> Date<p>
+     * route -> Route<p>
+     * user -> User<p>
+     */
+    Purchase createPurchase (String code, Date date, Route route, User user) throws ToursException;
+    
+    ItemService addItemToPurchase (Service service, int quantity, Purchase purchase) throws ToursException;
+    
+    Optional<Purchase> getPurchaseByCode (String code);
+    
+    void deletePurchase (Purchase purchase) throws ToursException;
+    
+    Review addReviewToPurchase (int rating, String comment, Purchase purchase) throws ToursException;
 
     // CONSULTAS HQL
 
