@@ -31,6 +31,10 @@ public class Stop {
     @ManyToMany(mappedBy = "stops", cascade = {CascadeType.DETACH, CascadeType.REFRESH})
     private List<Route> routes = new ArrayList<Route>();
 
+    public Stop() {
+        // Default constructor for JPA
+    }
+
     public Stop(String name, String description) {
         this.name = name;
         this.description = description;

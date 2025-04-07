@@ -1,5 +1,6 @@
 package unlp.info.bd2.repositories;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,6 +9,9 @@ import unlp.info.bd2.model.Stop;
 import unlp.info.bd2.model.Supplier;
 import unlp.info.bd2.model.User;
 import unlp.info.bd2.utils.ToursException;
+import unlp.info.bd2.model.Service;
+
+import unlp.info.bd2.model.Route;
 
 public interface ToursRepository {
     
@@ -25,6 +29,31 @@ public interface ToursRepository {
     public List<Stop> getStopByNameStart(String name);
 
     //FABRI
+    public Route saveOrUpdateRoute(Route route) throws ToursException;
+
+    public Optional<Route> getRouteById(Long id);
+
+    public List<Route> getRoutesBelowPrice(float price);
+
+    public void assignDriverByUsername(String username, Long idRoute) throws ToursException;
+
+    public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException;
+
+    public Supplier saveOrUpdateSupplier(Supplier supplier) throws ToursException;
+
+    public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException;
+
+    public Service updateServicePriceById(Long id, float newPrice) throws ToursException;
+
+    public List<User> getTop5UsersMorePurchases();
+    
+    public long getCountOfPurchasesBetweenDates(Date start, Date end);
+
+    public List<Route> getRoutesWithStop(Stop stop);
+
+    public Long getMaxStopOfRoutes();
+
+    public List<Route> getRoutsNotSell();
 
 
     //FRANCO

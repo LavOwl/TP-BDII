@@ -36,6 +36,13 @@ public class TourGuideUser extends User {
         super();
     }
 
+    public void addRoute(Route route) {
+        if (this.routes == null) {
+            this.routes = new ArrayList<Route>();
+        }
+        this.routes.add(route);
+    }
+
     @Override
     @PreRemove
     protected void checkForFKReferences() throws ToursException {

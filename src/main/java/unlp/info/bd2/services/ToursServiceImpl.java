@@ -74,14 +74,41 @@ public class ToursServiceImpl implements ToursService {
     }
     
     //FABRI
-    public Route createRoute(String name, float price, float totalKm, int maxNumberOfUsers, List<Stop> stops) throws ToursException{return null;}
-    public Optional<Route> getRouteById(Long id){return null;}
-    public List<Route> getRoutesBelowPrice(float price){return null;}
-    public void assignDriverByUsername(String username, Long idRoute) throws ToursException{}
-    public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException{}
-    public Supplier createSupplier(String businessName, String authorizationNumber) throws ToursException{return null;}
-    public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException{return null;}
-    public Service updateServicePriceById(Long id, float newPrice) throws ToursException{return null;}
+    public Route createRoute(String name, float price, float totalKm, int maxNumberOfUsers, List<Stop> stops) throws ToursException{
+        Route route = new Route(name, price, totalKm, maxNumberOfUsers, stops);
+        return toursRepository.saveOrUpdateRoute(route);
+    }
+    public Optional<Route> getRouteById(Long id) {
+        return toursRepository.getRouteById(id);
+    }
+    public List<Route> getRoutesBelowPrice(float price){ // deberia chequear que no me entre como parametro un precio negativo? y que sean numeros?       
+        return toursRepository.getRoutesBelowPrice(price);
+    }
+    public void assignDriverByUsername(String username, Long idRoute) throws ToursException{
+        toursRepository.assignDriverByUsername(username, idRoute);
+    }
+    public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException{
+        toursRepository.assignTourGuideByUsername(username, idRoute);
+    }
+    public Supplier createSupplier(String businessName, String authorizationNumber) throws ToursException{
+        if(businessName.contains("_") || businessName.contains("%")){
+            throw new ToursException("Cannot use '% or '_' in the name of a supplier"); //Couldn't find an HQL function to avoid SQL injection, could manually map characters to /wildcard or similar, but would take too much time and effort.
+        }
+        Supplier supplier = new Supplier(businessName, authorizationNumber);
+        return toursRepository.saveOrUpdateSupplier(supplier);
+    }
+    public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException{
+        if(name.contains("_") || name.contains("%")){
+            throw new ToursException("Cannot use '% or '_' in the name of a service"); //Couldn't find an HQL function to avoid SQL injection, could manually map characters to /wildcard or similar, but would take too much time and effort.
+        }
+        if(description.contains("_") || description.contains("%")){
+            throw new ToursException("Cannot use '% or '_' in the description of a service"); //Couldn't find an HQL function to avoid SQL injection, could manually map characters to /wildcard or similar, but would take too much time and effort.
+        }
+        return toursRepository.addServiceToSupplier(name, price, description, supplier);
+    }
+    public Service updateServicePriceById(Long id, float newPrice) throws ToursException{
+        return toursRepository.updateServicePriceById(id, newPrice);
+    }
     
     //FRANCO
     public Optional<Supplier> getSupplierById(Long id){return null;}
@@ -114,11 +141,21 @@ public class ToursServiceImpl implements ToursService {
     }
     
     //FABRI
-    public List<User> getTop5UsersMorePurchases(){return null;}
-    public long getCountOfPurchasesBetweenDates(Date start, Date end){return 0;}
-    public List<Route> getRoutesWithStop(Stop stop){return null;}
-    public Long getMaxStopOfRoutes(){return null;}
-    public List<Route> getRoutsNotSell(){return null;}
+    public List<User> getTop5UsersMorePurchases(){
+        return toursRepository.getTop5UsersMorePurchases();
+    }
+    public long getCountOfPurchasesBetweenDates(Date start, Date end){
+        return toursRepository.getCountOfPurchasesBetweenDates(start, end);
+    }
+    public List<Route> getRoutesWithStop(Stop stop){
+        return toursRepository.getRoutesWithStop(stop);
+    }
+    public Long getMaxStopOfRoutes(){
+        return toursRepository.getMaxStopOfRoutes();
+    }
+    public List<Route> getRoutsNotSell(){
+        return toursRepository.getRoutsNotSell();
+    }
     
     //FRANCO
     public List<Route> getTop3RoutesWithMaxRating(){return null;}

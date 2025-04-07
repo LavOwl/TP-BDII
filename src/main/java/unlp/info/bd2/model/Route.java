@@ -14,6 +14,8 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
+import java.util.ArrayList;
+import jakarta.persistence.FetchType;
 
 @Data
 @Entity
@@ -36,27 +38,56 @@ public class Route {
     @Column(name = "maxNumberUsers", nullable = false)
     private int maxNumberUsers;
 
-    @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.DETACH, CascadeType.MERGE},fetch = FetchType.EAGER)
     @JoinTable(name = "route_stop", joinColumns = @JoinColumn(name = "route_id"), inverseJoinColumns = @JoinColumn(name = "stop_id"))
-    private List<Stop> stops;
+    private List<Stop> stops = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.DETACH, CascadeType.MERGE},fetch = FetchType.EAGER)
     @JoinTable(name = "route_driver", joinColumns = @JoinColumn(name = "route_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "driverUser_id"))
-    private List<DriverUser> driverList;
+    private List<DriverUser> driverList = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.DETACH, CascadeType.MERGE},fetch = FetchType.EAGER)
     @JoinTable(name = "route_guide", joinColumns = @JoinColumn(name = "route_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "tourGuideUser_id"))
-    private List<TourGuideUser> tourGuideList;
+    private List<TourGuideUser> tourGuideList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "route", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Purchase> purchases;
+    @OneToMany(mappedBy = "route", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
+    private List<Purchase> purchases = new ArrayList<>();
+
+    public Route() {
+        // Default constructor
+    }
+
+    public Route (String name, float price, float totalKm, int maxNumberUsers, List<Stop> stops) {
+        this.name = name;
+        this.price = price;
+        this.totalKm = totalKm;
+        this.maxNumberUsers = maxNumberUsers;
+        this.stops = stops;
+    }
 
     public void addDriver(DriverUser driver){
-        //Implement
+        //modifique aca
+
+        // Check if the driver is already in the list to avoid duplicates
+        if (this.driverList.contains(driver)) {
+            return;
+        }
+        // Add the driver to the list and set the route reference in the driver
+        this.driverList.add(driver);
+
+        //hasta aca la modificacion
     }
 
     public void addTourGuide(TourGuideUser tourGuide){
-        //Implement
-    }
+        //modifique aca
 
+        // Check if the tour guide is already in the list to avoid duplicates
+        if (this.tourGuideList.contains(tourGuide)) {
+            return;
+        }
+        // Add the tour guide to the list and set the route reference in the tour guide
+        this.tourGuideList.add(tourGuide);
+        
+        //hasta aca la modificacion
+    }
 }
