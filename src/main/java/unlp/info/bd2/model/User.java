@@ -19,7 +19,9 @@ import jakarta.persistence.InheritanceType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PreRemove;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Setter;
 import unlp.info.bd2.utils.ToursException;
 
 @Data
@@ -52,6 +54,7 @@ public class User {
     @Column(name = "phoneNumber", nullable = false, length = 15)
     private String phoneNumber;
 
+    @Setter(AccessLevel.PRIVATE)
     @Column(name = "active", nullable = false)
     private boolean active = true;
 
@@ -75,6 +78,9 @@ public class User {
         if (purchaseList != null && !purchaseList.isEmpty()) {
             this.active = false;
             throw new IllegalStateException();
+        }
+        if(!this.isActive()){
+            throw new ToursException("El usuario se encuentra desactivado");
         }
     }
 }

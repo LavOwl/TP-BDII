@@ -79,9 +79,6 @@ public class ToursRepositoryImpl implements ToursRepository {
         Transaction transaction = session.beginTransaction();
         User user = session.get(User.class, id);
         if (user != null) {
-            if(!user.isActive()){
-                throw new ToursException("El usuario se encuentra desactivado");
-            }
             try{
                 session.remove(user);
             }
