@@ -100,13 +100,11 @@ class ToursApplicationTests {
 		user1.setUsername("user2");
 		this.toursService.updateUser(user1);
 		Optional<User> opUserFromDB = this.toursService.getUserByUsername("user2");
-		//assertTrue(opUserFromDB.isEmpty()); Erroneous testing, again -.-
-		assertTrue(opUserFromDB.isPresent()); //New line
+		assertTrue(opUserFromDB.isEmpty());
 		Optional<User> opUnmodifiedUserFromDB = this.toursService.getUserByUsername("user1");
-		//assertTrue(opUnmodifiedUserFromDB.isPresent()); Yet more erroneous testing. Yippee
-		assertTrue(opUnmodifiedUserFromDB.isEmpty()); //New line
-		//User unmodifiedUserFromDB = opUnmodifiedUserFromDB.get(); Yeah, no, it doesn't work. Ofc.
-		//assertEquals(unmodifiedUserFromDB.getId(), user1.getId());
+		assertTrue(opUnmodifiedUserFromDB.isPresent());
+		User unmodifiedUserFromDB = opUnmodifiedUserFromDB.get();
+		assertEquals(unmodifiedUserFromDB.getId(), user1.getId());
 	}
 
 	@Test
