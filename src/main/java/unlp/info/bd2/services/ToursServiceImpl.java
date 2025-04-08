@@ -190,8 +190,18 @@ public class ToursServiceImpl implements ToursService {
     }
     
     //FRANCO
-    public List<Route> getTop3RoutesWithMaxRating(){return null;}
-    public Service getMostDemandedService(){return null;}
+    public List<Route> getTop3RoutesWithMaxRating(){
+        return toursRepository.getTop3RoutesWithMaxAverageRating(); // Usa el que hizo Fabri
+    }
+
+    public List<Route> getRoutesWithMinRating() {
+        return toursRepository.getRoutesWithMinRating();
+    }
+
+    public Service getMostDemandedService(){
+        return toursRepository.getMostDemandedService();
+    }
+
     public List<Service> getServiceNoAddedToPurchases(){return null;}
     public List<TourGuideUser> getTourGuidesWithRating1(){return null;}
 

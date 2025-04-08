@@ -9,6 +9,7 @@ import unlp.info.bd2.model.Purchase;
 import unlp.info.bd2.model.Review;
 import unlp.info.bd2.model.Stop;
 import unlp.info.bd2.model.Supplier;
+import unlp.info.bd2.model.TourGuideUser;
 import unlp.info.bd2.model.User;
 import unlp.info.bd2.utils.ToursException;
 import unlp.info.bd2.model.Service;
@@ -94,4 +95,16 @@ public interface ToursRepository {
     //FABRI
 
     //FRANCO
+    /** Returns the top 3 routes with max average rating in his reviews and purchases associated */
+    List<Route> getTop3RoutesWithMaxAverageRating();
+
+    /** Return the Routes that have at least a one-star rating */
+    List<Route> getRoutesWithMinRating();
+
+    /** Returns the service that was included the most times in purchases, taking into account 
+     * the quantity. */
+    Service getMostDemandedService();
+    
+    List<Service> getServiceNoAddedToPurchases();
+    List<TourGuideUser> getTourGuidesWithRating1();
 }

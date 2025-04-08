@@ -356,7 +356,7 @@ public class ToursRepositoryImpl implements ToursRepository {
         return purchase;
     }
     
-    public void deletePurchase(Purchase purchase) throws ToursException {
+    public void deletePurchase(Purchase purchase) throws ToursException { //deberia funcionar gracias a la anotaciones en las clases
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
         session.remove(purchase);
@@ -506,5 +506,36 @@ public class ToursRepositoryImpl implements ToursRepository {
     }
     
     //FRANCO
+    //public List<Route> getTop3RoutesWithMaxAverageRating(){return null;}
 
+    public List<Route> getRoutesWithMinRating() {
+        Session session = sessionFactory.openSession();
+        List<Route> routes = session.createQuery(
+                            "SELECT DISTINCT route " +
+                            "FROM Route route " +
+                            "WHERE EXISTS ( " +
+                                "SELECT 1 "+
+                                "FROM Purchase p " +
+                                "WHERE p.route = r AND p.review.rating = 1" +
+                            ")", Route.class)
+                            .list();
+        session.close();
+        return routes;
+    }
+
+    public Service getMostDemandedService() {
+        Session session =  sessionFactory.openSession();
+        Service service = session.createQuery(
+                            "SELECT item.service " +
+                            "FROM ItemService item " +
+                            "GROUP BY item.service " +
+                            "ORDER BY SUM(item.quantity) DESC", Service.class)
+                            .setMaxResults(1)
+                            .uniqueResult();
+        session.close();
+        return service;
+    }
+
+    public List<Service> getServiceNoAddedToPurchases(){return null;}
+    public List<TourGuideUser> getTourGuidesWithRating1(){return null;}
 }

@@ -91,9 +91,24 @@ public interface ToursService {
     List<Route> getRoutsNotSell();
 
     //FRANCO
+    /** Returns the top 3 Routes with max average rating in his reviews and purchases associated */
     List<Route> getTop3RoutesWithMaxRating();
+
+    /** Return the Routes that have at least a one-star rating */
+    List<Route> getRoutesWithMinRating();
+
+    /** Returns the service that was included the most times in purchases, taking into account 
+     * the quantity. */
     Service getMostDemandedService();
+    
     List<Service> getServiceNoAddedToPurchases();
     List<TourGuideUser> getTourGuidesWithRating1();
 
+    /**FALTAN
+    List<User> getUsersWithNumberOfPurchases(int number);
+    List<Supplier> getTopNSuppliersItemsSold(int n);
+    List<Purchase> getTop10MoreExpensivePurchasesWithServices();
+    Route getMostBestSellingRoute();
+    DriverUser getDriverUserWithMoreRoutes();
+    */
 }
