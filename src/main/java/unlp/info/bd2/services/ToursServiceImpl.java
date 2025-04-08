@@ -110,16 +110,48 @@ public class ToursServiceImpl implements ToursService {
         return toursRepository.updateServicePriceById(id, newPrice);
     }
     
-    //FRANCO
-    public Optional<Supplier> getSupplierById(Long id){return null;}
-    public Optional<Supplier> getSupplierByAuthorizationNumber(String authorizationNumber){return null;}
-    public Optional<Service> getServiceByNameAndSupplierId(String name, Long id) throws ToursException{return null;}
-    public Purchase createPurchase(String code, Route route, User user) throws ToursException{return null;}
-    public Purchase createPurchase(String code, Date date, Route route, User user) throws ToursException{return null;}
-    public ItemService addItemToPurchase(Service service, int quantity, Purchase purchase) throws ToursException{return null;}
-    public Optional<Purchase> getPurchaseByCode(String code){return null;}
-    public void deletePurchase(Purchase purchase) throws ToursException{}
-    public Review addReviewToPurchase(int rating, String comment, Purchase purchase) throws ToursException{return null;}
+     //FRANCO
+     public Optional<Supplier> getSupplierById (Long id) {
+        return toursRepository.getSupplierById(id);
+    }
+
+    public Optional<Supplier> getSupplierByAuthorizationNumber (String authorizationNumber) {
+        return toursRepository.getSupplierByAuthorizationNumber(authorizationNumber);
+    }
+
+    public Optional<Service> getServiceByNameAndSupplierId (String name, Long id) throws ToursException {
+        return toursRepository.getServiceByNameAndSupplierId(name, id);
+    }
+    
+    public Purchase createPurchase (String code, Route route, User user) throws ToursException {
+        Purchase purchase = new Purchase(code, route, user);
+        return toursRepository.savePurchase(purchase);
+    }
+    
+    public Purchase createPurchase (String code, Date date, Route route, User user) throws ToursException {
+        Purchase purchase = new Purchase(code, date, route, user);
+        return toursRepository.savePurchase(purchase);
+    }
+    
+    public ItemService addItemToPurchase (Service service, int quantity, Purchase purchase) throws ToursException {
+        return toursRepository.addItemToPurchase(service, quantity, purchase);
+    }
+    
+    public Optional<Purchase> getPurchaseByCode (String code) {
+        return toursRepository.getPurchaseByCode(code);
+    }
+    
+    public void deletePurchase (Purchase purchase) throws ToursException {
+        toursRepository.deletePurchase(purchase);
+    }
+    
+    public Review addReviewToPurchase (int rating, String comment, Purchase purchase) throws ToursException {
+        //supongo que el rating debe estar entre 0 y 10
+        if (rating < 0 && rating > 10)
+            throw new ToursException("The rating of the review must be between 0 and 10");
+            
+        return toursRepository.addReviewToPurchase(rating, comment, purchase);
+    }
 
     // CONSULTAS HQL
 
@@ -158,8 +190,36 @@ public class ToursServiceImpl implements ToursService {
     }
     
     //FRANCO
-    public List<Route> getTop3RoutesWithMaxRating(){return null;}
-    public Service getMostDemandedService(){return null;}
+    public List<Route> getTop3RoutesWithMaxRating(){
+        return toursRepository.getTop3RoutesWithMaxAverageRating(); // Usa el que hizo Fabri
+    }
+
+    public List<Route> getRoutesWithMinRating() {
+        return toursRepository.getRoutesWithMinRating();
+    }
+
+    public Service getMostDemandedService(){
+        return toursRepository.getMostDemandedService();
+    }
+
     public List<Service> getServiceNoAddedToPurchases(){return null;}
     public List<TourGuideUser> getTourGuidesWithRating1(){return null;}
+
+    // No son necesarios, Spring ya lo hace, con parametrizar bien la consulta funciona
+    // Methods to validate data
+    /** Validates the String sent to use it in a query */
+    /*private boolean validateString (String str) {
+        if (str == null || str.length() > 255 || str.isBlank() || str.contains("_") || str.contains("%")) 
+            return false;
+    
+        return true;
+    }*/
+
+    /** Validates the Long sent to use it in a query */
+    /*private boolean validatesLong (Long number) {
+        if (number == null || number < 0)
+            return false;
+        
+        return true; 
+    }*/
 }

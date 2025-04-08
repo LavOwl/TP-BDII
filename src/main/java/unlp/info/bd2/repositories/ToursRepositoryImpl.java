@@ -271,15 +271,90 @@ public class ToursRepositoryImpl implements ToursRepository {
     }
     
     //FRANCO
-    public Optional<Supplier> getSupplierById(Long id){return null;}
-    public Optional<Supplier> getSupplierByAuthorizationNumber(String authorizationNumber){return null;}
-    public Optional<Service> getServiceByNameAndSupplierId(String name, Long id) throws ToursException{return null;}
-    public Purchase createPurchase(String code, Route route, User user) throws ToursException{return null;}
-    public Purchase createPurchase(String code, Date date, Route route, User user) throws ToursException{return null;}
-    public ItemService addItemToPurchase(Service service, int quantity, Purchase purchase) throws ToursException{return null;}
-    public Optional<Purchase> getPurchaseByCode(String code){return null;}
-    public void deletePurchase(Purchase purchase) throws ToursException{}
-    public Review addReviewToPurchase(int rating, String comment, Purchase purchase) throws ToursException{return null;}
+    public Optional<Supplier> getSupplierById(Long id) {
+        Session session = sessionFactory.openSession();
+        Supplier supplier = session.find(Supplier.class, id);
+        session.close();
+        return Optional.ofNullable(supplier);
+    }
+
+    public Optional<Supplier> getSupplierByAuthorizationNumber(String authorizationNumber) {
+        Session session = sessionFactory.openSession();
+        Supplier supplier = session.createQuery("FROM Supplier s WHERE s.authorizationNumber = :authorizationNumber", Supplier.class)
+                            .setParameter("authorizationNumber", authorizationNumber)
+                            .uniqueResult();
+        session.close();
+        return Optional.ofNullable(supplier);
+    }
+    
+    public Optional<Service> getServiceByNameAndSupplierId(String name, Long id) throws ToursException {
+        Session session = sessionFactory.openSession();
+        List<Service> services = session.createQuery("FROM Service s WHERE s.name = :serviceName AND s.supplier.id = :supplierId")
+                                    .setParameter("serviceName", name)
+                                    .setParameter("supplierId", id)
+                                    .getResultList();
+        session.close();
+
+        if (services.size() > 1) {
+            throw new ToursException("There are many (at least 2) services with the same name sent");
+        }
+
+        if (services.size() == 1)
+            return Optional.of(services.get(0));
+        else
+            return Optional.empty();
+    }
+    
+    public Purchase savePurchase (Purchase purchase) throws ToursException {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.persist(purchase);
+        transaction.commit();
+        session.close();
+        return purchase;
+    }
+    
+    public ItemService addItemToPurchase(Service service, int quantity, Purchase purchase) throws ToursException {
+        ItemService item = new ItemService(service, quantity, purchase);
+        float price = quantity * service.getPrice();
+        purchase.addItem(item, price);
+
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.persist(item);
+        session.merge(purchase);
+        transaction.commit();
+        session.close();
+        return item;
+    }
+    
+    public Optional<Purchase> getPurchaseByCode(String code) {
+        Session session = sessionFactory.openSession();
+        Optional<Purchase> purchase = (Optional<Purchase>) session.createQuery("FROM Purchase p WHERE p.code = :purchaseCode")
+                            .setParameter("purchaseCode", code)
+                            .uniqueResult();
+        session.close();
+        return purchase;
+    }
+    
+    public void deletePurchase(Purchase purchase) throws ToursException { //deberia funcionar gracias a la anotaciones en las clases
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.remove(purchase);
+        transaction.commit();
+        session.close();
+    }
+    
+    public Review addReviewToPurchase(int rating, String comment, Purchase purchase) throws ToursException {
+        Review review = purchase.addReview(rating, comment);
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.persist(review);
+        session.merge(purchase);
+        transaction.commit();
+        session.close();
+        return review;
+    }
 
 
     //HQL SENTENCES
@@ -412,5 +487,36 @@ public class ToursRepositoryImpl implements ToursRepository {
     }
     
     //FRANCO
+    //public List<Route> getTop3RoutesWithMaxAverageRating(){return null;}
 
+    public List<Route> getRoutesWithMinRating() {
+        Session session = sessionFactory.openSession();
+        List<Route> routes = session.createQuery(
+                            "SELECT DISTINCT route " +
+                            "FROM Route route " +
+                            "WHERE EXISTS ( " +
+                                "SELECT 1 "+
+                                "FROM Purchase p " +
+                                "WHERE p.route = r AND p.review.rating = 1" +
+                            ")", Route.class)
+                            .list();
+        session.close();
+        return routes;
+    }
+
+    public Service getMostDemandedService() {
+        Session session =  sessionFactory.openSession();
+        Service service = session.createQuery(
+                            "SELECT item.service " +
+                            "FROM ItemService item " +
+                            "GROUP BY item.service " +
+                            "ORDER BY SUM(item.quantity) DESC", Service.class)
+                            .setMaxResults(1)
+                            .uniqueResult();
+        session.close();
+        return service;
+    }
+
+    public List<Service> getServiceNoAddedToPurchases(){return null;}
+    public List<TourGuideUser> getTourGuidesWithRating1(){return null;}
 }

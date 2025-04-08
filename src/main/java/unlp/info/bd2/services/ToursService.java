@@ -30,15 +30,50 @@ public interface ToursService {
     Service updateServicePriceById(Long id, float newPrice) throws ToursException;
     
     //FRANCO
-    Optional<Supplier> getSupplierById(Long id);
-    Optional<Supplier> getSupplierByAuthorizationNumber(String authorizationNumber);
-    Optional<Service> getServiceByNameAndSupplierId(String name, Long id) throws ToursException;
-    Purchase createPurchase(String code, Route route, User user) throws ToursException;
-    Purchase createPurchase(String code, Date date, Route route, User user) throws ToursException;
-    ItemService addItemToPurchase(Service service, int quantity, Purchase purchase) throws ToursException;
-    Optional<Purchase> getPurchaseByCode(String code);
-    void deletePurchase(Purchase purchase) throws ToursException;
-    Review addReviewToPurchase(int rating, String comment, Purchase purchase) throws ToursException;
+    /** Returns the Supplier of the ID sent if it's exists. */
+    Optional<Supplier> getSupplierById (Long id);
+    
+    /** Returns the Supplier of the Authorization Number sent if it's exists. */
+    Optional<Supplier> getSupplierByAuthorizationNumber (String authorizationNumber);
+    
+    /** Returns the Service that corresponds with his name and her supplier ID if it's exists.<p>
+     */
+    Optional<Service> getServiceByNameAndSupplierId (String name, Long id) throws ToursException;
+    
+    /** Creates a Purchase by the arguments sent:<p>
+     * code -> String<p>
+     * route -> Route<p>
+     * user -> User<p>
+     */
+    Purchase createPurchase (String code, Route route, User user) throws ToursException;
+    
+    /** Creates a Purchase by the arguments sent:<p>
+     * code -> String<p>
+     * date -> Date<p>
+     * route -> Route<p>
+     * user -> User<p>
+     */
+    Purchase createPurchase (String code, Date date, Route route, User user) throws ToursException;
+    
+    /** Creates an ItemService and add's it in the given Purchase. Receives:<p>
+     * service -> Service<p>
+     * quantity -> int<p>
+     * purchase -> Purchase<p>
+     */
+    ItemService addItemToPurchase (Service service, int quantity, Purchase purchase) throws ToursException;
+    
+    /** Returns the Purchase by the code sent */
+    Optional<Purchase> getPurchaseByCode (String code);
+    
+    /** Deletes the Purchase given from the DB */
+    void deletePurchase (Purchase purchase) throws ToursException;
+    
+    /** Creates a Review and add's it in the given Purchase. Receives:<p>
+     * rating -> int<p>
+     * comment -> String<p>
+     * purchase -> Purchase<p>
+     */
+    Review addReviewToPurchase (int rating, String comment, Purchase purchase) throws ToursException;
 
     // CONSULTAS HQL
 
@@ -56,9 +91,24 @@ public interface ToursService {
     List<Route> getRoutsNotSell();
 
     //FRANCO
+    /** Returns the top 3 Routes with max average rating in his reviews and purchases associated */
     List<Route> getTop3RoutesWithMaxRating();
+
+    /** Return the Routes that have at least a one-star rating */
+    List<Route> getRoutesWithMinRating();
+
+    /** Returns the service that was included the most times in purchases, taking into account 
+     * the quantity. */
     Service getMostDemandedService();
+    
     List<Service> getServiceNoAddedToPurchases();
     List<TourGuideUser> getTourGuidesWithRating1();
 
+    /**FALTAN
+    List<User> getUsersWithNumberOfPurchases(int number);
+    List<Supplier> getTopNSuppliersItemsSold(int n);
+    List<Purchase> getTop10MoreExpensivePurchasesWithServices();
+    Route getMostBestSellingRoute();
+    DriverUser getDriverUserWithMoreRoutes();
+    */
 }

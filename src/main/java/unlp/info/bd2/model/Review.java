@@ -30,4 +30,11 @@ public class Review {
     @OneToOne(cascade = {CascadeType.REFRESH, CascadeType.DETACH}) //Cascading other operations can lead to infinite loops.
     @JoinColumn(name = "purchase_id", referencedColumnName = "id", nullable = false)
     private Purchase purchase;
+
+
+    public Review (int rating, String comment, Purchase purchase) {
+        this.rating = rating;
+        this.comment = comment;
+        this.purchase = purchase;
+    }
 }
