@@ -272,28 +272,27 @@ public class ToursRepositoryImpl implements ToursRepository {
     
     //FRANCO
     public Optional<Supplier> getSupplierById(Long id) {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         Supplier supplier = session.find(Supplier.class, id);
-        session.close();
+
         return Optional.ofNullable(supplier);
     }
 
     public Optional<Supplier> getSupplierByAuthorizationNumber(String authorizationNumber) {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         Supplier supplier = session.createQuery("FROM Supplier s WHERE s.authorizationNumber = :authorizationNumber", Supplier.class)
                             .setParameter("authorizationNumber", authorizationNumber)
                             .uniqueResult();
-        session.close();
+
         return Optional.ofNullable(supplier);
     }
     
     public Optional<Service> getServiceByNameAndSupplierId(String name, Long id) throws ToursException {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         List<Service> services = session.createQuery("FROM Service s WHERE s.name = :serviceName AND s.supplier.id = :supplierId")
                                     .setParameter("serviceName", name)
                                     .setParameter("supplierId", id)
                                     .getResultList();
-        session.close();
 
         if (services.size() > 1) {
             throw new ToursException("There are many (at least 2) services with the same name sent");
@@ -305,54 +304,46 @@ public class ToursRepositoryImpl implements ToursRepository {
             return Optional.empty();
     }
     
+    @Transactional
     public Purchase savePurchase (Purchase purchase) throws ToursException {
-        Session session = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
+        Session session = sessionFactory.getCurrentSession();
         session.persist(purchase);
-        transaction.commit();
-        session.close();
         return purchase;
     }
     
+    @Transactional
     public ItemService addItemToPurchase(Service service, int quantity, Purchase purchase) throws ToursException {
         ItemService item = new ItemService(service, quantity, purchase);
         float price = quantity * service.getPrice();
         purchase.addItem(item, price);
 
-        Session session = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
+        Session session = sessionFactory.getCurrentSession();
         session.persist(item);
         session.merge(purchase);
-        transaction.commit();
-        session.close();
         return item;
     }
     
     public Optional<Purchase> getPurchaseByCode(String code) {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         Optional<Purchase> purchase = (Optional<Purchase>) session.createQuery("FROM Purchase p WHERE p.code = :purchaseCode")
                             .setParameter("purchaseCode", code)
                             .uniqueResult();
-        session.close();
+                            
         return purchase;
     }
     
+    @Transactional
     public void deletePurchase(Purchase purchase) throws ToursException { //deberia funcionar gracias a la anotaciones en las clases
-        Session session = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
+        Session session = sessionFactory.getCurrentSession();
         session.remove(purchase);
-        transaction.commit();
-        session.close();
     }
     
+    @Transactional
     public Review addReviewToPurchase(int rating, String comment, Purchase purchase) throws ToursException {
         Review review = purchase.addReview(rating, comment);
-        Session session = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
+        Session session = sessionFactory.getCurrentSession();
         session.persist(review);
         session.merge(purchase);
-        transaction.commit();
-        session.close();
         return review;
     }
 
@@ -490,7 +481,7 @@ public class ToursRepositoryImpl implements ToursRepository {
     //public List<Route> getTop3RoutesWithMaxAverageRating(){return null;}
 
     public List<Route> getRoutesWithMinRating() {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         List<Route> routes = session.createQuery(
                             "SELECT DISTINCT route " +
                             "FROM Route route " +
@@ -500,12 +491,11 @@ public class ToursRepositoryImpl implements ToursRepository {
                                 "WHERE p.route = r AND p.review.rating = 1" +
                             ")", Route.class)
                             .list();
-        session.close();
         return routes;
     }
 
     public Service getMostDemandedService() {
-        Session session =  sessionFactory.openSession();
+        Session session =  sessionFactory.getCurrentSession();
         Service service = session.createQuery(
                             "SELECT item.service " +
                             "FROM ItemService item " +
@@ -513,7 +503,6 @@ public class ToursRepositoryImpl implements ToursRepository {
                             "ORDER BY SUM(item.quantity) DESC", Service.class)
                             .setMaxResults(1)
                             .uniqueResult();
-        session.close();
         return service;
     }
 
