@@ -190,7 +190,7 @@ public class ToursServiceImpl implements ToursService {
     }
     
     //FRANCO
-    public List<Route> getTop3RoutesWithMaxRating(){
+    public List<Route> getTop3RoutesWithMaxRating() {
         return toursRepository.getTop3RoutesWithMaxAverageRating(); // Usa el que hizo Fabri
     }
 
@@ -198,12 +198,17 @@ public class ToursServiceImpl implements ToursService {
         return toursRepository.getRoutesWithMinRating();
     }
 
-    public Service getMostDemandedService(){
+    public Service getMostDemandedService() {
         return toursRepository.getMostDemandedService();
     }
 
-    public List<Service> getServiceNoAddedToPurchases(){return null;}
-    public List<TourGuideUser> getTourGuidesWithRating1(){return null;}
+    public List<Service> getServiceNoAddedToPurchases() {
+        return toursRepository.getServiceNoAddedToPurchases();
+    }
+
+    public List<TourGuideUser> getTourGuidesWithRating1() {
+        return toursRepository.getTourGuidesWithRating1();
+    }
 
     // No son necesarios, Spring ya lo hace, con parametrizar bien la consulta funciona
     // Methods to validate data

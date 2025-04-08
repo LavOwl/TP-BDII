@@ -105,6 +105,9 @@ public interface ToursRepository {
      * the quantity. */
     Service getMostDemandedService();
     
+    /** Returns the services that weren´t included in any purchase */
     List<Service> getServiceNoAddedToPurchases();
+
+    /** Returns tour guides assigned to any one-star rated tour */
     List<TourGuideUser> getTourGuidesWithRating1();
 }

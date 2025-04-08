@@ -101,10 +101,13 @@ public interface ToursService {
      * the quantity. */
     Service getMostDemandedService();
     
+    /** Returns the services that weren´t included in any purchase */
     List<Service> getServiceNoAddedToPurchases();
+
+    /** Returns tour guides assigned to any one-star rated tour */
     List<TourGuideUser> getTourGuidesWithRating1();
 
-    /**FALTAN
+    /**FALTAN (NO ESTAN EN EL CODIGO, PERO SI EN LA CONSIGNA DE ESTE AÑO)
     List<User> getUsersWithNumberOfPurchases(int number);
     List<Supplier> getTopNSuppliersItemsSold(int n);
     List<Purchase> getTop10MoreExpensivePurchasesWithServices();

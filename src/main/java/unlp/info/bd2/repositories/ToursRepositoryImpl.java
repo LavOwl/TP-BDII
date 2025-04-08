@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.PersistenceException;
@@ -478,7 +477,7 @@ public class ToursRepositoryImpl implements ToursRepository {
     }
     
     //FRANCO
-    //public List<Route> getTop3RoutesWithMaxAverageRating(){return null;}
+    //public List<Route> getTop3RoutesWithMaxAverageRating(){return null;} 
 
     public List<Route> getRoutesWithMinRating() {
         Session session = sessionFactory.getCurrentSession();
@@ -495,7 +494,7 @@ public class ToursRepositoryImpl implements ToursRepository {
     }
 
     public Service getMostDemandedService() {
-        Session session =  sessionFactory.getCurrentSession();
+        Session session = sessionFactory.getCurrentSession();
         Service service = session.createQuery(
                             "SELECT item.service " +
                             "FROM ItemService item " +
@@ -506,6 +505,33 @@ public class ToursRepositoryImpl implements ToursRepository {
         return service;
     }
 
-    public List<Service> getServiceNoAddedToPurchases(){return null;}
-    public List<TourGuideUser> getTourGuidesWithRating1(){return null;}
+    public List<Service> getServiceNoAddedToPurchases() {
+        Session session = sessionFactory.getCurrentSession();
+        List<Service> services = session.createQuery(
+                                "SELECT service " + 
+                                "FROM Service service " +
+                                "WHERE NOT EXISTS (" +
+                                    "SELECT 1 " +
+                                    "FROM ItemService item " +
+                                    "WHERE item.service = service" +
+                                ")", Service.class)
+                                .list();
+        return services;
+    }
+
+    // Creo que se puede hacer con varios joins, que sería más eficiente (creo, además siempre dijeron 
+    // que el IN no era eficiente, y más si la BD es grande), pero lo veo más legible así
+    public List<TourGuideUser> getTourGuidesWithRating1() {
+        Session session = sessionFactory.getCurrentSession();
+        List<TourGuideUser> tgusers = session.createQuery(
+                                        "SELECT DISTINCT tguser " +
+                                        "FROM TourGuideUser tguser JOIN tguser.routes route " + 
+                                        "WHERE route IN (" +
+                                            "SELECT route " + 
+                                            "FROM Route route JOIN Purchase purchase JOIN purchase.review review " + 
+                                            "WHERE review.rating = 1" +
+                                        ")", TourGuideUser.class)
+                                        .list();
+        return tgusers;
+    }
 }
