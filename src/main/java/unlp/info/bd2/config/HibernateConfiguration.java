@@ -47,7 +47,6 @@ public class HibernateConfiguration {
 
     private Properties hibernateProperties() {
         Properties hibernateProperties = new Properties();
-        hibernateProperties.setProperty("hibernate.connection.init_sql", "SET FOREIGN_KEY_CHECKS=0");
         hibernateProperties.setProperty("hibernate.hbm2ddl.auto", "create-drop");
         hibernateProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
         hibernateProperties.setProperty("hibernate.show_sql", "true");

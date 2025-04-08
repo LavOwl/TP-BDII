@@ -1,5 +1,6 @@
 package unlp.info.bd2.repositories;
 
+import java.lang.StackWalker.Option;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -7,10 +8,13 @@ import java.util.Optional;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolationException;
 import unlp.info.bd2.model.ItemService;
 import unlp.info.bd2.model.Purchase;
 import unlp.info.bd2.model.Review;
@@ -27,6 +31,8 @@ public class ToursRepositoryImpl implements ToursRepository {
 
     @Autowired
     private SessionFactory sessionFactory;
+
+    private static final Logger log = LoggerFactory.getLogger(ToursRepositoryImpl.class);
 
     //IVY
     @Transactional
@@ -194,36 +200,15 @@ public class ToursRepositoryImpl implements ToursRepository {
     }
 
     @Transactional
-    public Supplier createSupplier(String businessName, String authorizationNumber) throws ToursException{
-        Session session = sessionFactory.getCurrentSession();
-        if ( authorizationNumber == null || businessName == null){
-            
-            throw new ToursException("Cannot use null in the name or authorization number of a supplier"); 
-        }
-        /* 
-        Supplier sameAuthorizationNumberSupplier = session.createQuery("FROM Supplier s WHERE s.authorizationNumber = :authorizationNumber", Supplier.class)
-                                .setParameter("authorizationNumber", authorizationNumber)
-                                .uniqueResult();
-        if (sameAuthorizationNumberSupplier != null) {
-            
-            
-            throw new ToursException("Tried to store repeated authorization number");
-        }
-            si el numero de autorizacion no se puede repetir va esto
-        */
-        Supplier supplier = session.createQuery("INSERT INTO Supplier (businessName, authorizationNumber) VALUES (:businessName, :authorizationNumber)", Supplier.class)
-                                .setParameter("businessName", businessName)
-                                .setParameter("authorizationNumber", authorizationNumber)
-                                .uniqueResult();
-        
-        return supplier;
-    }
-
-
-    @Transactional
     public Supplier saveOrUpdateSupplier(Supplier supplier) throws ToursException{
         Session session = sessionFactory.getCurrentSession();
         if (supplier.getId() == null || Objects.isNull(session.find(Supplier.class, supplier.getId()))) {
+            Supplier sameAuthorizationNumberSupplier = session.createQuery("FROM Supplier s WHERE s.authorizationNumber = :authorizationNumber", Supplier.class)
+                                .setParameter("authorizationNumber", supplier.getAuthorizationNumber())
+                                .uniqueResult();
+            if (sameAuthorizationNumberSupplier != null) {
+            throw new ToursException("Constraint Violation");
+        }
             session.persist(supplier);
         } else {
             session.merge(supplier);
@@ -324,11 +309,11 @@ public class ToursRepositoryImpl implements ToursRepository {
     
     public Optional<Purchase> getPurchaseByCode(String code) {
         Session session = sessionFactory.getCurrentSession();
-        Optional<Purchase> purchase = (Optional<Purchase>) session.createQuery("FROM Purchase p WHERE p.code = :purchaseCode")
+        Purchase purchase = session.createQuery("FROM Purchase p WHERE p.code = :purchaseCode", Purchase.class)
                             .setParameter("purchaseCode", code)
                             .uniqueResult();
                             
-        return purchase;
+        return Optional.ofNullable(purchase);
     }
     
     @Transactional

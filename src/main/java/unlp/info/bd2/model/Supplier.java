@@ -26,7 +26,7 @@ public class Supplier {
     @Column(name = "businessName", nullable = false, length = 255)
     private String businessName;
 
-    @Column(name = "authorizationNumber", nullable = false, length = 255) //Verify length
+    @Column(name = "authorizationNumber", nullable = false, length = 255, unique = true) //Verify length
     private String authorizationNumber;
 
     @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, orphanRemoval = true)
