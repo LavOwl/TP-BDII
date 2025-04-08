@@ -429,7 +429,7 @@ public class ToursRepositoryImpl implements ToursRepository {
 
     public List<Route> getTop3RoutesWithMaxAverageRating(){
         Session session = sessionFactory.getCurrentSession();
-        List<Route> routes = session.createQuery("SELECT r FROM Route r JOIN r.reviews rev GROUP BY r.id ORDER BY AVG(rev.rating) DESC", Route.class)
+        List<Route> routes = session.createQuery("SELECT r FROM Route r JOIN r.purchases p JOIN p.review rev GROUP BY r.id ORDER BY AVG(rev.rating) DESC", Route.class)
                     .setMaxResults(3)
                     .list();
         
@@ -513,7 +513,7 @@ public class ToursRepositoryImpl implements ToursRepository {
                                         "FROM TourGuideUser tguser JOIN tguser.routes route " + 
                                         "WHERE route IN (" +
                                             "SELECT route " + 
-                                            "FROM Route route JOIN Purchase purchase JOIN purchase.review review " + 
+                                            "FROM Route route JOIN route.purchases purchase JOIN purchase.review review " + 
                                             "WHERE review.rating = 1" +
                                         ")", TourGuideUser.class)
                                         .list();

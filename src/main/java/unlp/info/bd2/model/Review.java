@@ -37,4 +37,8 @@ public class Review {
         this.comment = comment;
         this.purchase = purchase;
     }
+
+    public Review(){
+        
+    }
 }

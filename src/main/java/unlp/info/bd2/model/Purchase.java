@@ -66,6 +66,10 @@ public class Purchase {
         this.route = route;
     }
 
+    public Purchase(){
+        
+    }
+
     public void addItem (ItemService item, float price) {
         this.itemServiceList.add(item);
         this.totalPrice += price;
