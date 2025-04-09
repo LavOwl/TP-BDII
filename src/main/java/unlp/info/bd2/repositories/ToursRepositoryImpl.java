@@ -300,6 +300,7 @@ public class ToursRepositoryImpl implements ToursRepository {
         ItemService item = new ItemService(service, quantity, purchase);
         float price = quantity * service.getPrice();
         purchase.addItem(item, price);
+        service.addItemService(item);
 
         Session session = sessionFactory.getCurrentSession();
         session.persist(item);
@@ -319,6 +320,7 @@ public class ToursRepositoryImpl implements ToursRepository {
     @Transactional
     public void deletePurchase(Purchase purchase) throws ToursException { //deberia funcionar gracias a la anotaciones en las clases
         Session session = sessionFactory.getCurrentSession();
+        session.clear();
         session.remove(purchase);
     }
     

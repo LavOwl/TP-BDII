@@ -50,4 +50,7 @@ public class Service {
         this.description = description;
         this.supplier = supplier;
     }
+    public void addItemService(ItemService itemService) {
+        this.itemServiceList.add(itemService);
+    }
 }
