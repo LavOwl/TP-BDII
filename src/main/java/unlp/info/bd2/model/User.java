@@ -75,12 +75,12 @@ public class User {
 
     @PreRemove
     protected void checkForFKReferences() throws ToursException {
+        if(!this.isActive()){
+            throw new IllegalStateException("El usuario se encuentra desactivado");
+        }
         if (purchaseList != null && !purchaseList.isEmpty()) {
             this.active = false;
             throw new IllegalStateException();
-        }
-        if(!this.isActive()){
-            throw new ToursException("El usuario se encuentra desactivado");
         }
     }
 
