@@ -122,14 +122,29 @@ public class ToursServiceImpl implements ToursService {
     public Optional<Service> getServiceByNameAndSupplierId (String name, Long id) throws ToursException {
         return toursRepository.getServiceByNameAndSupplierId(name, id);
     }
+
+    public void checkPurcharses(String code, Route route, User user) throws ToursException {
+        if (getPurchaseByCode(code).isPresent()) {
+            throw new ToursException("The purchase code already exists");
+        }
+        if (route.getPurchases().size() >= route.getMaxNumberUsers()) {
+            throw new ToursException("The route is full, you cannot add more purchases");
+        }
+    }
     
     public Purchase createPurchase (String code, Route route, User user) throws ToursException {
+        checkPurcharses(code, route, user);
         Purchase purchase = new Purchase(code, route, user);
+        user.addPurchase(purchase);
+        route.addPurchase(purchase);
         return toursRepository.savePurchase(purchase);
     }
     
     public Purchase createPurchase (String code, Date date, Route route, User user) throws ToursException {
+        checkPurcharses(code, route, user);
         Purchase purchase = new Purchase(code, date, route, user);
+        user.addPurchase(purchase);
+        route.addPurchase(purchase);
         return toursRepository.savePurchase(purchase);
     }
     

@@ -83,4 +83,8 @@ public class User {
             throw new ToursException("El usuario se encuentra desactivado");
         }
     }
+
+    public void addPurchase(Purchase purchase) {
+        purchaseList.add(purchase);
+    }
 }

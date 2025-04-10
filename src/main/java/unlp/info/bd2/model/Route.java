@@ -90,4 +90,8 @@ public class Route {
         
         //hasta aca la modificacion
     }
+
+    public void addPurchase(Purchase purchase) {
+        this.purchases.add(purchase);
+    }
 }
