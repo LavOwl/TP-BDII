@@ -147,7 +147,7 @@ public class ToursServiceImpl implements ToursService {
     public Purchase createPurchase (String code, Date date, Route route, User user) throws ToursException {
         checkPurcharses(code, route, user);
         Purchase purchase = new Purchase(code, date, route, user);
-        addRelationsToPurchase(purchase, route, user); // si lo descomento, ocurre stack overflow
+        //addRelationsToPurchase(purchase, route, user); // si lo descomento, ocurre stack overflow
         return toursRepository.savePurchase(purchase);
     }
     
