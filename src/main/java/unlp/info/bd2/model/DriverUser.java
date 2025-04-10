@@ -52,7 +52,7 @@ public class DriverUser extends User {
     @PreRemove
     protected void checkForFKReferences() throws ToursException {
         if((this.routes != null && !this.routes.isEmpty())){
-            throw new ToursException("El usuario no puede ser desactivado");
+            throw new IllegalStateException("El usuario no puede ser desactivado");
         }
         super.checkForFKReferences();
     }

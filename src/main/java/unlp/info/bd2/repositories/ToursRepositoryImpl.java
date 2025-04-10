@@ -77,6 +77,7 @@ public class ToursRepositoryImpl implements ToursRepository {
         return Optional.ofNullable(user);
     }
 
+    /*
     @Transactional
     public void deleteUser(Long id) throws ToursException {
         Session session = sessionFactory.getCurrentSession();
@@ -101,6 +102,26 @@ public class ToursRepositoryImpl implements ToursRepository {
         } else {
             // No tiene compras: eliminar físicamente
             session.remove(user);
+        }
+    }*/
+
+    @Transactional
+    public void deleteUser(Long id) throws ToursException{
+        Session session = sessionFactory.getCurrentSession();
+        User user = session.get(User.class, id);
+        if (user != null) {
+            try{
+                session.remove(user);
+            }
+            catch(IllegalStateException e){
+                session.merge(user);
+                if(e.getMessage() == "El usuario se encuentra desactivado" || e.getMessage() == "El usuario no puede ser desactivado"){
+                    throw new ToursException(e.getMessage());
+                }
+            }
+        }
+        else{
+            throw new ToursException("Tried to delete non-existent user");
         }
     }
 
