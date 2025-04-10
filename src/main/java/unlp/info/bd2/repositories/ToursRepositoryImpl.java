@@ -1,10 +1,12 @@
 package unlp.info.bd2.repositories;
 
 import java.lang.StackWalker.Option;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Iterator;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -76,25 +78,30 @@ public class ToursRepositoryImpl implements ToursRepository {
     }
 
     @Transactional
-    public void deleteUser(Long id) throws ToursException{
+    public void deleteUser(Long id) throws ToursException {
         Session session = sessionFactory.getCurrentSession();
         User user = session.get(User.class, id);
-        if (user != null) {
-            try{
-                session.remove(user);
-            }
-            catch(PersistenceException e){
-                session.merge(user);
-                if(e.getCause() instanceof ToursException){
-                    
-                    throw new ToursException(e.getMessage());
-                }
-            }
-        }
-        else{
+    
+        if (user == null) {
             throw new ToursException("Tried to delete non-existent user");
         }
-        
+    
+        if (!user.isActive()) {
+            throw new ToursException("El usuario se encuentra desactivado");
+        }
+    
+        if (user instanceof TourGuideUser) {
+            throw new ToursException("El usuario no puede ser desactivado");
+        }
+    
+        if (user.getPurchaseList() != null && !user.getPurchaseList().isEmpty()) {
+            // Tiene compras: solo desactivar
+            user.desactivar();
+            session.merge(user);
+        } else {
+            // No tiene compras: eliminar físicamente
+            session.remove(user);
+        }
     }
 
     @Transactional

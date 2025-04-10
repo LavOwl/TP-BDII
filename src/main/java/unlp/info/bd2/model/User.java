@@ -87,4 +87,8 @@ public class User {
     public void addPurchase(Purchase purchase) {
         purchaseList.add(purchase);
     }
+
+    public void desactivar() {
+        this.active = false;
+    }
 }
