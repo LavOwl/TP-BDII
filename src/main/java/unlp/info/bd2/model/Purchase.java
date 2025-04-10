@@ -3,6 +3,7 @@ package unlp.info.bd2.model;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -79,5 +80,17 @@ public class Purchase {
         Review review = new Review(rating, comment, this);
         this.review = review;
         return this.review;
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, code, totalPrice, date); // Excluir review
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Purchase purchase = (Purchase) o;
+        return Objects.equals(id, purchase.id);
     }
 }

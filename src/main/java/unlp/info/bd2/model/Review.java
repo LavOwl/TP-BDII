@@ -1,5 +1,7 @@
 package unlp.info.bd2.model;
 
+import java.util.Objects;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,5 +42,17 @@ public class Review {
 
     public Review(){
         
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, rating, comment); // Excluir purchase
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Review review = (Review) o;
+        return Objects.equals(id, review.id);
     }
 }
