@@ -355,7 +355,7 @@ public class ToursRepositoryImpl implements ToursRepository {
 
     public List<User> getUserSpendingMoreThan(float amount){
         Session session = sessionFactory.getCurrentSession();
-        List<User> users = session.createQuery("SELECT u FROM Purchase p JOIN p.user u GROUP BY u.id HAVING SUM(p.totalPrice) > :amount", User.class)
+        List<User> users = session.createQuery("SELECT u FROM Purchase p JOIN p.user u GROUP BY u.id HAVING SUM(p.totalPrice) >= :amount", User.class)
                     .setParameter("amount", amount)
                     .list();
         

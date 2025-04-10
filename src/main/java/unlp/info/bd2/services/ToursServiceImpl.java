@@ -131,20 +131,23 @@ public class ToursServiceImpl implements ToursService {
             throw new ToursException("The route is full, you cannot add more purchases");
         }
     }
+
+    public void addRelationsToPurchase (Purchase purchase, Route route, User user) throws ToursException {
+        route.addPurchase(purchase);
+        user.addPurchase(purchase);
+    }
     
     public Purchase createPurchase (String code, Route route, User user) throws ToursException {
         checkPurcharses(code, route, user);
         Purchase purchase = new Purchase(code, route, user);
-        user.addPurchase(purchase);
-        route.addPurchase(purchase);
+        addRelationsToPurchase(purchase, route, user);
         return toursRepository.savePurchase(purchase);
     }
     
     public Purchase createPurchase (String code, Date date, Route route, User user) throws ToursException {
         checkPurcharses(code, route, user);
         Purchase purchase = new Purchase(code, date, route, user);
-        user.addPurchase(purchase);
-        route.addPurchase(purchase);
+        addRelationsToPurchase(purchase, route, user); // si lo descomento, ocurre stack overflow
         return toursRepository.savePurchase(purchase);
     }
     
