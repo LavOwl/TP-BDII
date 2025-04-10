@@ -481,7 +481,7 @@ public class ToursRepositoryImpl implements ToursRepository {
                             "WHERE EXISTS ( " +
                                 "SELECT 1 "+
                                 "FROM Purchase p " +
-                                "WHERE p.route = r AND p.review.rating = 1" +
+                                "WHERE p.route = route AND p.review.rating = 1" +
                             ")", Route.class)
                             .list();
         return routes;
