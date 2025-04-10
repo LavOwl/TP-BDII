@@ -327,7 +327,7 @@ public class ToursRepositoryImpl implements ToursRepository {
     @Transactional
     public void deletePurchase(Purchase purchase) throws ToursException { //deberia funcionar gracias a la anotaciones en las clases
         Session session = sessionFactory.getCurrentSession();
-        session.clear();
+        session.clear(); // esto para consultar ¿por que anda con esto y sin esto no?
         session.remove(purchase);
     }
     
@@ -371,15 +371,21 @@ public class ToursRepositoryImpl implements ToursRepository {
         return suppliers;
     }
     
-    public List<Purchase> getTop10MoreExpensivePurchasesInServices(){
-        //Criteria isn't clear
+    public List<Purchase> getTop10MoreExpensivePurchasesInServices() {
         Session session = sessionFactory.getCurrentSession();
-        List<Purchase> purchases = session.createQuery("SELECT p FROM Purchase p ORDER BY p.totalPrice DESC", Purchase.class)
-                    .setMaxResults(10)
-                    .list();
-        
-        return purchases;
+        return session.createQuery("""
+        SELECT p FROM Purchase p
+        WHERE EXISTS (SELECT 1 FROM ItemService i WHERE i.purchase = p)
+        ORDER BY (
+            p.route.price + 
+            (SELECT COALESCE(SUM(i.service.price * i.quantity), 0) 
+            FROM ItemService i WHERE i.purchase = p)
+        ) DESC
+        """, Purchase.class)
+        .setMaxResults(10)
+        .list();
     }
+    
 
     //FABRI
 
