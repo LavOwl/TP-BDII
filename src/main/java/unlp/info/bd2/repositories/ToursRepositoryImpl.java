@@ -374,13 +374,19 @@ public class ToursRepositoryImpl implements ToursRepository {
         return purchases;
     }
 
-    public List<User> getUserSpendingMoreThan(float amount){
+    public List<User> getUserSpendingMoreThan(float amount) {
         Session session = sessionFactory.getCurrentSession();
-        List<User> users = session.createQuery("SELECT u FROM Purchase p JOIN p.user u GROUP BY u.id HAVING SUM(p.totalPrice) >= :amount", User.class)
-                    .setParameter("amount", amount)
-                    .list();
         
-        return users;
+        return session.createQuery("""
+            SELECT DISTINCT p.user 
+            FROM Purchase p
+            WHERE (p.route.price + 
+                  (SELECT COALESCE(SUM(i.service.price * i.quantity), 0) 
+                   FROM ItemService i 
+                   WHERE i.purchase = p)) >= :amount
+            """, User.class)
+            .setParameter("amount", amount)
+            .list();
     }
     
     public List<Supplier> getTopNSuppliersInPurchases(int n){
