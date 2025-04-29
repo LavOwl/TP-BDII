@@ -330,7 +330,6 @@ public class ToursRepositoryImpl implements ToursRepository {
 
         Session session = sessionFactory.getCurrentSession();
         session.persist(item);
-        session.merge(purchase);
         return item;
     }
     
@@ -355,7 +354,6 @@ public class ToursRepositoryImpl implements ToursRepository {
         Review review = purchase.addReview(rating, comment);
         Session session = sessionFactory.getCurrentSession();
         session.persist(review);
-        session.merge(purchase);
         return review;
     }
 
@@ -372,13 +370,19 @@ public class ToursRepositoryImpl implements ToursRepository {
         return purchases;
     }
 
-    public List<User> getUserSpendingMoreThan(float amount){
+    public List<User> getUserSpendingMoreThan(float amount) {
         Session session = sessionFactory.getCurrentSession();
-        List<User> users = session.createQuery("SELECT u FROM Purchase p JOIN p.user u GROUP BY u.id HAVING SUM(p.totalPrice) >= :amount", User.class)
-                    .setParameter("amount", amount)
-                    .list();
         
-        return users;
+        return session.createQuery("""
+            SELECT DISTINCT p.user 
+            FROM Purchase p
+            WHERE (p.route.price + 
+                  (SELECT COALESCE(SUM(i.service.price * i.quantity), 0) 
+                   FROM ItemService i 
+                   WHERE i.purchase = p)) >= :amount
+            """, User.class)
+            .setParameter("amount", amount)
+            .list();
     }
     
     public List<Supplier> getTopNSuppliersInPurchases(int n){
@@ -538,10 +542,18 @@ public class ToursRepositoryImpl implements ToursRepository {
         return services;
     }
 
-    // Creo que se puede hacer con varios joins, que sería más eficiente (creo, además siempre dijeron 
-    // que el IN no era eficiente, y más si la BD es grande), pero lo veo más legible así
     public List<TourGuideUser> getTourGuidesWithRating1() {
         Session session = sessionFactory.getCurrentSession();
+        List<TourGuideUser> tgusers = session.createQuery(
+                                        "SELECT DISTINCT tguser " +
+                                        "FROM TourGuideUser tguser " +
+                                                "JOIN tguser.routes route JOIN route.purchases purchase " +
+                                                "JOIN purchase.review review " + 
+                                        "WHERE review.rating = 1", TourGuideUser.class)
+                                        .list();
+        return tgusers;
+    }
+    /* Resguardo de la consulta con IN (decidí cambiarla por la eficiencia)
         List<TourGuideUser> tgusers = session.createQuery(
                                         "SELECT DISTINCT tguser " +
                                         "FROM TourGuideUser tguser JOIN tguser.routes route " + 
@@ -551,6 +563,5 @@ public class ToursRepositoryImpl implements ToursRepository {
                                             "WHERE review.rating = 1" +
                                         ")", TourGuideUser.class)
                                         .list();
-        return tgusers;
-    }
+     */
 }
