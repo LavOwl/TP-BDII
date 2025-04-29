@@ -1,12 +1,9 @@
 package unlp.info.bd2.repositories;
 
-import java.lang.StackWalker.Option;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Iterator;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -299,7 +296,7 @@ public class ToursRepositoryImpl implements ToursRepository {
     
     public Optional<Service> getServiceByNameAndSupplierId(String name, Long id) throws ToursException {
         Session session = sessionFactory.getCurrentSession();
-        List<Service> services = session.createQuery("FROM Service s WHERE s.name = :serviceName AND s.supplier.id = :supplierId")
+        List<Service> services = session.createQuery("FROM Service s WHERE s.name = :serviceName AND s.supplier.id = :supplierId", Service.class)
                                     .setParameter("serviceName", name)
                                     .setParameter("supplierId", id)
                                     .getResultList();
@@ -345,7 +342,11 @@ public class ToursRepositoryImpl implements ToursRepository {
     @Transactional
     public void deletePurchase(Purchase purchase) throws ToursException { //deberia funcionar gracias a la anotaciones en las clases
         Session session = sessionFactory.getCurrentSession();
-        session.clear(); // esto para consultar ¿por que anda con esto y sin esto no?
+        //session.clear(); // esto para consultar ¿por que anda con esto y sin esto no?
+        purchase.getUser().getPurchaseList().remove(purchase);
+        purchase.getRoute().getPurchases().remove(purchase);
+        purchase.getItemServiceList().clear();
+        
         session.remove(purchase);
     }
     
@@ -387,7 +388,7 @@ public class ToursRepositoryImpl implements ToursRepository {
     
     public List<Supplier> getTopNSuppliersInPurchases(int n){
         Session session = sessionFactory.getCurrentSession();
-        List<Supplier> suppliers = session.createQuery("SELECT s FROM ItemService is JOIN is.service serv JOIN serv.supplier s GROUP BY s.id ORDER BY COUNT(is) DESC", Supplier.class)
+        List<Supplier> suppliers = session.createQuery("SELECT s FROM ItemService is JOIN is.service serv JOIN serv.supplier s JOIN is.purchase p GROUP BY s.id ORDER BY COUNT(p) DESC", Supplier.class)
                     .setMaxResults(n)
                     .list();
         
