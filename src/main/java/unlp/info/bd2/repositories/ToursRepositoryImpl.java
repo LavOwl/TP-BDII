@@ -371,11 +371,7 @@ public class ToursRepositoryImpl implements ToursRepository {
         return session.createQuery("""
         SELECT p FROM Purchase p
         WHERE EXISTS (SELECT 1 FROM ItemService i WHERE i.purchase = p)
-        ORDER BY (
-            p.route.price + 
-            (SELECT COALESCE(SUM(i.service.price * i.quantity), 0) 
-            FROM ItemService i WHERE i.purchase = p)
-        ) DESC
+        ORDER BY p.totalPrice DESC
         """, Purchase.class)
         .setMaxResults(10)
         .list();
