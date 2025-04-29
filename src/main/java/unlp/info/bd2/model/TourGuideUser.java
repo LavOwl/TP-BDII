@@ -17,7 +17,7 @@ import unlp.info.bd2.utils.ToursException;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@DiscriminatorValue("TourGuide")
+@DiscriminatorValue("tour_guide")
 public class TourGuideUser extends User {
 
     @Column(name = "education", nullable = true) //Analyze later if it's actually nullable, or should be mandatory

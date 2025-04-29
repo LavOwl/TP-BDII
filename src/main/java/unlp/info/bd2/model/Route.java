@@ -32,10 +32,10 @@ public class Route {
     @Column(name = "price", nullable = false)
     private float price;
 
-    @Column(name = "totalKm", nullable = false)
+    @Column(name = "total_km", nullable = false)
     private float totalKm;
 
-    @Column(name = "maxNumberUsers", nullable = false)
+    @Column(name = "max_number_users", nullable = false)
     private int maxNumberUsers;
 
     @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.DETACH, CascadeType.MERGE},fetch = FetchType.EAGER)

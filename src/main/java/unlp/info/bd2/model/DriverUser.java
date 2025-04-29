@@ -18,7 +18,7 @@ import unlp.info.bd2.utils.ToursException;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@DiscriminatorValue("Driver")
+@DiscriminatorValue("driver")
 public class DriverUser extends User {
 
     @Column(name = "expedient", nullable = true)

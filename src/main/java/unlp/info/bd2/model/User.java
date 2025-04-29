@@ -28,8 +28,8 @@ import unlp.info.bd2.utils.ToursException;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
-@DiscriminatorValue("User")
-@Table(name = "AppUser")
+@DiscriminatorValue("user")
+@Table(name = "APP_USER")
 public class User {
 
     @Id
@@ -51,7 +51,7 @@ public class User {
     @Column(name = "date", nullable = false)
     private Date birthdate;
 
-    @Column(name = "phoneNumber", nullable = false, length = 15)
+    @Column(name = "phone_number", nullable = false, length = 15)
     private String phoneNumber;
 
     @Setter(AccessLevel.PRIVATE)

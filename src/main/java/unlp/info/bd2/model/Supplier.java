@@ -23,10 +23,10 @@ public class Supplier {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "businessName", nullable = false, length = 255)
+    @Column(name = "business_name", nullable = false, length = 255)
     private String businessName;
 
-    @Column(name = "authorizationNumber", nullable = false, length = 255, unique = true) //Verify length
+    @Column(name = "authorization_number", nullable = false, length = 255, unique = true) //Verify length
     private String authorizationNumber;
 
     @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, orphanRemoval = true)
