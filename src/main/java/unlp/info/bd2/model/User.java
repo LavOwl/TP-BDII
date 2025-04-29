@@ -58,7 +58,7 @@ public class User {
     @Column(name = "active", nullable = false)
     private boolean active = true;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Purchase> purchaseList = new ArrayList<Purchase>();
 
     public User(String username, String password, String name, String email, Date birthdate, String phoneNumber) {

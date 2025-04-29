@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import jakarta.transaction.Transactional;
 import unlp.info.bd2.model.ItemService;
 import unlp.info.bd2.model.Purchase;
 import unlp.info.bd2.model.Review;
@@ -32,7 +31,7 @@ public class ToursRepositoryImpl implements ToursRepository {
     private static final Logger log = LoggerFactory.getLogger(ToursRepositoryImpl.class);
 
     //IVY
-    @Transactional
+    
     public User saveOrUpdateUser(User user) throws ToursException{
         Session session = sessionFactory.getCurrentSession();
         User sameId = null;
@@ -47,7 +46,7 @@ public class ToursRepositoryImpl implements ToursRepository {
                 session.persist(user);
             }
             else{
-                throw new ToursException("Tried to store repeated username");
+                throw new ToursException("Tried to store repeated username"); //Could be handled in the service, unique-constraint exception
             }
         } else {
 
@@ -72,35 +71,7 @@ public class ToursRepositoryImpl implements ToursRepository {
         return Optional.ofNullable(user);
     }
 
-    /*
-    @Transactional
-    public void deleteUser(Long id) throws ToursException {
-        Session session = sessionFactory.getCurrentSession();
-        User user = session.get(User.class, id);
     
-        if (user == null) {
-            throw new ToursException("Tried to delete non-existent user");
-        }
-    
-        if (!user.isActive()) {
-            throw new ToursException("El usuario se encuentra desactivado");
-        }
-    
-        if (user instanceof TourGuideUser) {
-            throw new ToursException("El usuario no puede ser desactivado");
-        }
-    
-        if (user.getPurchaseList() != null && !user.getPurchaseList().isEmpty()) {
-            // Tiene compras: solo desactivar
-            user.desactivar();
-            session.merge(user);
-        } else {
-            // No tiene compras: eliminar físicamente
-            session.remove(user);
-        }
-    }*/
-
-    @Transactional
     public void deleteUser(Long id) throws ToursException{
         Session session = sessionFactory.getCurrentSession();
         User user = session.get(User.class, id);
@@ -111,16 +82,16 @@ public class ToursRepositoryImpl implements ToursRepository {
             catch(IllegalStateException e){
                 session.merge(user);
                 if(e.getMessage() == "El usuario se encuentra desactivado" || e.getMessage() == "El usuario no puede ser desactivado"){
-                    throw new ToursException(e.getMessage());
+                    throw new ToursException(e.getMessage()); //Can be handled in service, IllegalStateException
                 }
             }
         }
         else{
-            throw new ToursException("Tried to delete non-existent user");
+            throw new ToursException("Tried to delete non-existent user"); //Can maybe just be removed? Or handled in service if already exists
         }
     }
 
-    @Transactional
+    
     public Stop saveOrUpdateStop(Stop stop){
         Session session = sessionFactory.getCurrentSession();
 
@@ -144,7 +115,7 @@ public class ToursRepositoryImpl implements ToursRepository {
     }
     
     //FABRI
-    @Transactional
+    
     public Route saveOrUpdateRoute(Route route) throws ToursException {
         Session session = sessionFactory.getCurrentSession();
         if (route.getId() == null || Objects.isNull(session.find(Route.class, route.getId()))) {
@@ -172,7 +143,7 @@ public class ToursRepositoryImpl implements ToursRepository {
         return routes;
      }
 
-     @Transactional
+     
     public void assignDriverByUsername(String username, Long idRoute) throws ToursException{
         Session session = sessionFactory.getCurrentSession();
         DriverUser driver = session.createQuery("FROM DriverUser d WHERE d.username = :username", DriverUser.class)
@@ -181,15 +152,15 @@ public class ToursRepositoryImpl implements ToursRepository {
         Route route = session.find(Route.class, idRoute);
         if (driver == null) {
             
-            throw new ToursException("Tried to assign non-existent driver");
+            throw new ToursException("Tried to assign non-existent driver"); //Seems OK here
         }
         if (route == null) {
             
-            throw new ToursException("Tried to assign driver to non-existent route");
+            throw new ToursException("Tried to assign driver to non-existent route"); //Seems OK here
         }
         if (route.getDriverList().contains(driver)) {
             
-            throw new ToursException("Driver already assigned to route");
+            throw new ToursException("Driver already assigned to route"); //Seems OK here
         }
         route.addDriver(driver);
         driver.addRoute(route);
@@ -198,7 +169,7 @@ public class ToursRepositoryImpl implements ToursRepository {
         
     }
 
-    @Transactional
+    
     public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException{
         Session session = sessionFactory.getCurrentSession();
         TourGuideUser tourGuide = session.createQuery("FROM TourGuideUser t WHERE t.username = :username", TourGuideUser.class)
@@ -207,22 +178,22 @@ public class ToursRepositoryImpl implements ToursRepository {
         Route route = session.find(Route.class, idRoute);
         if (tourGuide == null) {
             
-            throw new ToursException("Tried to assign non-existent tour guide");
+            throw new ToursException("Tried to assign non-existent tour guide"); //Seems OK here
         }
         if (route == null) {
             
-            throw new ToursException("Tried to assign tour guide to non-existent route");
+            throw new ToursException("Tried to assign tour guide to non-existent route"); //Seems OK here
         }
         if (route.getTourGuideList().contains(tourGuide)) {
             
-            throw new ToursException("Tour guide already assigned to route");
+            throw new ToursException("Tour guide already assigned to route"); //Seems OK here
         }
         route.addTourGuide(tourGuide);
         tourGuide.addRoute(route);
         
     }
 
-    @Transactional
+    
     public Supplier saveOrUpdateSupplier(Supplier supplier) throws ToursException{
         Session session = sessionFactory.getCurrentSession();
         if (supplier.getId() == null || Objects.isNull(session.find(Supplier.class, supplier.getId()))) {
@@ -230,7 +201,7 @@ public class ToursRepositoryImpl implements ToursRepository {
                                 .setParameter("authorizationNumber", supplier.getAuthorizationNumber())
                                 .uniqueResult();
             if (sameAuthorizationNumberSupplier != null) {
-            throw new ToursException("Constraint Violation");
+            throw new ToursException("Constraint Violation"); //Could be handled in service uniqueconstraintexception
         }
             session.persist(supplier);
         } else {
@@ -240,18 +211,18 @@ public class ToursRepositoryImpl implements ToursRepository {
         return supplier;
     }
 
-    @Transactional
+    
     public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException{
         Session session = sessionFactory.getCurrentSession();
         if (supplier == null) {
             
             
-            throw new ToursException("Tried to add service to non-existent supplier");
+            throw new ToursException("Tried to add service to non-existent supplier"); //Can be handled in service
         }
         if (name == null || description == null) {
             
             
-            throw new ToursException("Cannot use null in the name or description of a service"); 
+            throw new ToursException("Cannot use null in the name or description of a service");  //Can be handled in service
         }
         Service service = new Service(name, price, description, supplier);
 
@@ -268,7 +239,7 @@ public class ToursRepositoryImpl implements ToursRepository {
         if (service == null) {
             
             
-            throw new ToursException("Tried to update non-existent service");
+            throw new ToursException("Tried to update non-existent service"); //Seems OK here
         }
         service.setPrice(newPrice);
         session.merge(service);
@@ -302,7 +273,7 @@ public class ToursRepositoryImpl implements ToursRepository {
                                     .getResultList();
 
         if (services.size() > 1) {
-            throw new ToursException("There are many (at least 2) services with the same name sent");
+            throw new ToursException("There are many (at least 2) services with the same name sent"); //This a rule? If so, Seems OK here
         }
 
         if (services.size() == 1)
@@ -311,14 +282,14 @@ public class ToursRepositoryImpl implements ToursRepository {
             return Optional.empty();
     }
     
-    @Transactional
+    
     public Purchase savePurchase (Purchase purchase) throws ToursException {
         Session session = sessionFactory.getCurrentSession();
         session.persist(purchase);
         return purchase;
     }
     
-    @Transactional
+    
     public ItemService addItemToPurchase(Service service, int quantity, Purchase purchase) throws ToursException {
         ItemService item = new ItemService(service, quantity, purchase);
         float price = quantity * service.getPrice();
@@ -339,7 +310,7 @@ public class ToursRepositoryImpl implements ToursRepository {
         return Optional.ofNullable(purchase);
     }
     
-    @Transactional
+    
     public void deletePurchase(Purchase purchase) throws ToursException { //deberia funcionar gracias a la anotaciones en las clases
         Session session = sessionFactory.getCurrentSession();
         //session.clear(); // esto para consultar ¿por que anda con esto y sin esto no?
@@ -350,7 +321,7 @@ public class ToursRepositoryImpl implements ToursRepository {
         session.remove(purchase);
     }
     
-    @Transactional
+    
     public Review addReviewToPurchase(int rating, String comment, Purchase purchase) throws ToursException {
         Review review = purchase.addReview(rating, comment);
         Session session = sessionFactory.getCurrentSession();
