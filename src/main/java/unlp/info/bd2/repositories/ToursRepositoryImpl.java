@@ -43,6 +43,11 @@ public class ToursRepositoryImpl implements ToursRepository {
         session.merge(updatedObject);
         return updatedObject;
     }
+
+    public void removeObject (Object objectToRemove) {
+        Session session = sessionFactory.getCurrentSession();
+        session.remove(objectToRemove);
+    }
     
     /*public User saveOrUpdateUser(User user) throws ToursException{
         Session session = sessionFactory.getCurrentSession();
@@ -84,15 +89,17 @@ public class ToursRepositoryImpl implements ToursRepository {
     }
 
     
-    public void deleteUser(Long id) throws ToursException{
+    /*public void deleteUser(Long id) throws ToursException{
         Session session = sessionFactory.getCurrentSession();
         User user = session.get(User.class, id);
         if (user != null) {
             try{
                 session.remove(user);
+                //toursRepository.removeObject(user)
             }
             catch(IllegalStateException e){
                 session.merge(user);
+                //toursRepository.updateObject(user)
                 if(e.getMessage() == "El usuario se encuentra desactivado" || e.getMessage() == "El usuario no puede ser desactivado"){
                     throw new ToursException(e.getMessage()); //Can be handled in service, IllegalStateException
                 }
@@ -101,7 +108,7 @@ public class ToursRepositoryImpl implements ToursRepository {
         else{
             throw new ToursException("Tried to delete non-existent user"); //Can maybe just be removed? Or handled in service if already exists
         }
-    }
+    }*/
 
     
     /*public Stop saveOrUpdateStop(Stop stop){
@@ -155,13 +162,23 @@ public class ToursRepositoryImpl implements ToursRepository {
         return routes;
      }
 
-     
-    public void assignDriverByUsername(String username, Long idRoute) throws ToursException{
+    
+    public Optional<DriverUser> getDriverByUsername(String username) {
+        Session session = sessionFactory.getCurrentSession();
+        DriverUser driver = session.createQuery("FROM DriverUser d WHERE d.username = :username", DriverUser.class)
+                                .setParameter("username", username)
+                                .uniqueResult();
+        return Optional.ofNullable(driver);
+    }
+
+    /*public void assignDriverByUsername(String username, Long idRoute) throws ToursException{
         Session session = sessionFactory.getCurrentSession();
         DriverUser driver = session.createQuery("FROM DriverUser d WHERE d.username = :username", DriverUser.class)
                                 .setParameter("username", username)
                                 .uniqueResult();
         Route route = session.find(Route.class, idRoute);
+        //Optional<DriverUser> driver = toursRepository.getDriverByUsername(username);
+        //Optional<Route> route = toursRepository.getRouteById(idRoute);
         if (driver == null) {
             
             throw new ToursException("Tried to assign non-existent driver"); //Seems OK here
@@ -180,10 +197,17 @@ public class ToursRepositoryImpl implements ToursRepository {
         //session.merge(route); // 
         
         //respondo a la pregunta: es el mismo caso que en updateServicePriceById
-    }
+    }*/
 
+    public Optional<TourGuideUser> getTourGuideByUsername (String username) {
+        Session session = sessionFactory.getCurrentSession();
+        TourGuideUser tourGuide = session.createQuery("FROM TourGuideUser t WHERE t.username = :username", TourGuideUser.class)
+                                .setParameter("username", username)
+                                .uniqueResult();
+        return Optional.ofNullable(tourGuide);
+    }
     
-    public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException{
+    /*public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException{
         Session session = sessionFactory.getCurrentSession();
         TourGuideUser tourGuide = session.createQuery("FROM TourGuideUser t WHERE t.username = :username", TourGuideUser.class)
                                 .setParameter("username", username)
@@ -204,7 +228,7 @@ public class ToursRepositoryImpl implements ToursRepository {
         route.addTourGuide(tourGuide);
         tourGuide.addRoute(route);
         
-    }
+    }*/
 
     
     /*public Supplier saveOrUpdateSupplier(Supplier supplier) throws ToursException{
@@ -225,7 +249,7 @@ public class ToursRepositoryImpl implements ToursRepository {
     }*/
 
     
-    public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException{
+    /*public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException{
         Session session = sessionFactory.getCurrentSession();
         Service service = new Service(name, price, description, supplier);
         session.persist(service);
@@ -235,7 +259,7 @@ public class ToursRepositoryImpl implements ToursRepository {
                                     //tiempo (desconocida) se fue a buscar. Pero si no fuera por eso, habria 
                                     //que hacer merge. Se lo deja asi o hay que agregarlo por las dudas?
         return service;
-    }
+    }*/
     /*public Service updateServicePriceById(Long id, float newPrice) throws ToursException{
         Session session = sessionFactory.getCurrentSession();
         
@@ -296,23 +320,23 @@ public class ToursRepositoryImpl implements ToursRepository {
     }
     
     
-    public Purchase savePurchase (Purchase purchase) throws ToursException {
+    /*public Purchase savePurchase (Purchase purchase) throws ToursException {
         Session session = sessionFactory.getCurrentSession();
         session.persist(purchase);
         return purchase;
-    }
+    }*/
     
     
-    public ItemService addItemToPurchase(ItemService item)/*(Service service, int quantity, Purchase purchase) throws ToursException*/ {
+    //public ItemService addItemToPurchase(ItemService item)/*(Service service, int quantity, Purchase purchase) throws ToursException*/ {
         /*ItemService item = new ItemService(service, quantity, purchase);
         float price = quantity * service.getPrice();
         purchase.addItem(item, price);
         service.addItemService(item);*/ //lo lleve al servicio, es logica de negocio a mi entender
-
+/* 
         Session session = sessionFactory.getCurrentSession();
         session.persist(item);
         return item;
-    }
+    }*/
     
     public Optional<Purchase> getPurchaseByCode(String code) {
         Session session = sessionFactory.getCurrentSession();
@@ -324,7 +348,7 @@ public class ToursRepositoryImpl implements ToursRepository {
     }
     
     
-    public void deletePurchase(Purchase purchase) throws ToursException { //deberia funcionar gracias a la anotaciones en las clases
+    /*public void deletePurchase(Purchase purchase) throws ToursException { //deberia funcionar gracias a la anotaciones en las clases
         Session session = sessionFactory.getCurrentSession();
         //session.clear(); // esto para consultar ¿por que anda con esto y sin esto no?
         //purchase.getUser().getPurchaseList().remove(purchase);
@@ -332,15 +356,15 @@ public class ToursRepositoryImpl implements ToursRepository {
         //purchase.getItemServiceList().clear();
         
         session.remove(purchase);
-    }
+    }*/
     
     
-    public Review addReviewToPurchase(int rating, String comment, Purchase purchase) throws ToursException {
+    /*public Review addReviewToPurchase(int rating, String comment, Purchase purchase) throws ToursException {
         Review review = purchase.addReview(rating, comment);
         Session session = sessionFactory.getCurrentSession();
         session.persist(review);
         return review;
-    }
+    }*/
 
 
     //HQL SENTENCES

@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.Session;
+
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import unlp.info.bd2.model.DriverUser;
@@ -66,7 +68,25 @@ public class ToursServiceImpl implements ToursService {
     @Override
      @Transactional
     public void deleteUser(@NotNull User user) throws ToursException{
-        toursRepository.deleteUser(user.getId());
+        //toursRepository.deleteUser(user.getId());
+
+        Optional<User> userDB = toursRepository.getUserById(user.getId());
+        if (!(userDB.isEmpty())) {
+            try{
+                //session.remove(user);
+                toursRepository.removeObject(user);
+            }
+            catch(IllegalStateException e){
+                //session.merge(user);
+                toursRepository.updateObject(user);
+                if(e.getMessage() == "El usuario se encuentra desactivado" || e.getMessage() == "El usuario no puede ser desactivado"){
+                    throw new ToursException(e.getMessage()); //Can be handled in service, IllegalStateException
+                }
+            }
+        }
+        else{
+            throw new ToursException("Tried to delete non-existent user"); //Can maybe just be removed? Or handled in service if already exists
+        }
     }
     @Override
      @Transactional
@@ -106,12 +126,48 @@ public class ToursServiceImpl implements ToursService {
     @Override
      @Transactional
     public void assignDriverByUsername(String username, Long idRoute) throws ToursException{
-        toursRepository.assignDriverByUsername(username, idRoute);
+        //toursRepository.assignDriverByUsername(username, idRoute);
+
+
+        Optional<DriverUser> driver = toursRepository.getDriverByUsername(username);
+        Optional<Route> route = toursRepository.getRouteById(idRoute);
+        if (driver.isEmpty()) {
+            
+            throw new ToursException("Tried to assign non-existent driver"); //Seems OK here
+        }
+        if (route.isEmpty()) {
+            
+            throw new ToursException("Tried to assign driver to non-existent route"); //Seems OK here
+        }
+        if (route.get().getDriverList().contains(driver.get())) {
+            
+            throw new ToursException("Driver already assigned to route"); //Seems OK here
+        }
+        route.get().addDriver(driver.get());
+        driver.get().addRoute(route.get());
     }
     @Override
      @Transactional
     public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException{
-        toursRepository.assignTourGuideByUsername(username, idRoute);
+        //toursRepository.assignTourGuideByUsername(username, idRoute);
+
+
+        Optional<TourGuideUser> tourGuide = toursRepository.getTourGuideByUsername(username);
+        Optional<Route> route = toursRepository.getRouteById(idRoute);
+        if (tourGuide.isEmpty()) {
+            
+            throw new ToursException("Tried to assign non-existent tour guide"); //Seems OK here
+        }
+        if (route.isEmpty()) {
+            
+            throw new ToursException("Tried to assign tour guide to non-existent route"); //Seems OK here
+        }
+        if (route.get().getTourGuideList().contains(tourGuide.get())) {
+            
+            throw new ToursException("Tour guide already assigned to route"); //Seems OK here
+        }
+        route.get().addTourGuide(tourGuide.get());
+        tourGuide.get().addRoute(route.get());
     }
     @Override
      @Transactional
@@ -140,7 +196,13 @@ public class ToursServiceImpl implements ToursService {
         if(description.contains("_") || description.contains("%")){
             throw new ToursException("Cannot use '% or '_' in the description of a service"); //Couldn't find an HQL function to avoid SQL injection, could manually map characters to /wildcard or similar, but would take too much time and effort.
         }
-        return toursRepository.addServiceToSupplier(name, price, description, supplier);
+
+        Service service = new Service(name, price, description, supplier);
+        toursRepository.saveNewObject(service);
+        supplier.addService(service);
+        return service;
+
+        //return toursRepository.addServiceToSupplier(name, price, description, supplier);
     }
     @Override
      @Transactional
@@ -207,7 +269,7 @@ public class ToursServiceImpl implements ToursService {
         float price = quantity * service.getPrice();
         purchase.addItem(item, price);
         service.addItemService(item);
-        return toursRepository.addItemToPurchase(item);
+        return (ItemService) toursRepository.saveNewObject(item);
         //return toursRepository.addItemToPurchase(service, quantity, purchase);
     }
     @Override
@@ -218,7 +280,7 @@ public class ToursServiceImpl implements ToursService {
     @Override
      @Transactional
     public void deletePurchase (Purchase purchase) throws ToursException {
-        toursRepository.deletePurchase(purchase);
+        toursRepository.removeObject(purchase);
     }
     @Override
      @Transactional
@@ -226,8 +288,11 @@ public class ToursServiceImpl implements ToursService {
         //supongo que el rating debe estar entre 0 y 10
         if (rating < 0 && rating > 10)
             throw new ToursException("The rating of the review must be between 0 and 10");
-            
-        return toursRepository.addReviewToPurchase(rating, comment, purchase);
+          
+        Review review = purchase.addReview(rating, comment);
+        return (Review) toursRepository.saveNewObject(review);    
+
+        //return toursRepository.addReviewToPurchase(rating, comment, purchase);
     }
 
     // CONSULTAS HQL

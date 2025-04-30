@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import unlp.info.bd2.model.DriverUser;
 import unlp.info.bd2.model.ItemService;
 import unlp.info.bd2.model.Purchase;
 import unlp.info.bd2.model.Review;
@@ -23,6 +24,9 @@ public interface ToursRepository {
 
     /** Updates in the Database the object sent */
     public Object updateObject (Object updatedObject);
+
+    /** Removes of the Database the object sent, and applies cascade efect, depending of the object */
+    public void removeObject (Object objectToRemove);
     
     //IVY
     //public User saveOrUpdateUser(User user) throws ToursException;
@@ -31,7 +35,7 @@ public interface ToursRepository {
 
     public Optional<User> getUserByUsername(String username);
 
-    public void deleteUser(Long id) throws ToursException;
+    //public void deleteUser(Long id) throws ToursException;
 
     //public Stop saveOrUpdateStop(Stop stop);
 
@@ -44,13 +48,17 @@ public interface ToursRepository {
 
     public List<Route> getRoutesBelowPrice(float price);
 
-    public void assignDriverByUsername(String username, Long idRoute) throws ToursException;
+    public Optional<DriverUser> getDriverByUsername (String username);
 
-    public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException;
+    //public void assignDriverByUsername(String username, Long idRoute) throws ToursException;
+
+    public Optional<TourGuideUser> getTourGuideByUsername (String username);
+    
+    //public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException;
 
     //public Supplier saveOrUpdateSupplier(Supplier supplier) throws ToursException;
 
-    public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException;
+    //public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException;
 
     //public Service updateServicePriceById(Long id, float newPrice) throws ToursException;
 
@@ -81,16 +89,16 @@ public interface ToursRepository {
     
     /** Creates and add an ItemService in the Purchase given */
     //public ItemService addItemToPurchase (Service service, int quantity, Purchase purchase) throws ToursException;
-    public ItemService addItemToPurchase (ItemService item) throws ToursException;
+    //public ItemService addItemToPurchase (ItemService item) throws ToursException;
 
     /** Returns the Purchase by the code sent */
     public Optional<Purchase> getPurchaseByCode (String code);
     
     /** Deletes the Purchase given from the DB */
-    public void deletePurchase (Purchase purchase) throws ToursException;
+    //public void deletePurchase (Purchase purchase) throws ToursException;
     
     /** Creates and add a Review in the Purchase given */
-    public Review addReviewToPurchase (int rating, String comment, Purchase purchase) throws ToursException;
+    //public Review addReviewToPurchase (int rating, String comment, Purchase purchase) throws ToursException;
 
     //HQL SENTENCES
 
