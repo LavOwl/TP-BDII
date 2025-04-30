@@ -17,6 +17,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import unlp.info.bd2.utils.ToursException;
 
 @Data
 @Entity
@@ -27,7 +28,7 @@ public class Purchase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "code", nullable = false)
+    @Column(name = "code", nullable = false, unique = true)
     private String code;
 
     @Column(name = "totalPrice", nullable = false)
@@ -36,35 +37,28 @@ public class Purchase {
     @Column(name = "date", nullable = false)
     private Date date;
 
-    @ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.DETACH}) //Cascading other operations can lead to infinite loops.
+    @ManyToOne(cascade = {CascadeType.MERGE})
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
-    @ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.DETACH}) //Cascading other operations can lead to infinite loops.
+    @ManyToOne(cascade = {CascadeType.MERGE})
     @JoinColumn(name = "route_id", referencedColumnName = "id", nullable = false)
-    private Route route; //Added Route reference to purchases to avoid null route_id through cascaded deletion.
+    private Route route;
 
-    @OneToOne(mappedBy = "purchase", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "purchase", cascade = {}, orphanRemoval = true)
     private Review review;
 
-    @OneToMany(mappedBy = "purchase", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "purchase", cascade = {}, orphanRemoval = true)
     private List<ItemService> itemServiceList = new ArrayList<ItemService>();
 
-
-    public Purchase (String code, Route route, User user) {
-        this.code = code;
-        this.totalPrice = route.getPrice();
-        this.date = new Date();
-        this.user = user;
-        this.route = route;
-    }
-
-    public Purchase (String code, Date date, Route route, User user) {
+    public Purchase (String code, Date date, Route route, User user) throws ToursException {
         this.code = code;
         this.totalPrice = route.getPrice();
         this.date = date;
         this.user = user;
         this.route = route;
+        this.route.addPurchase(this);
+        this.user.addPurchase(this);
     }
 
     public Purchase(){

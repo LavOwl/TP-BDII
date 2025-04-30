@@ -2,15 +2,13 @@ package unlp.info.bd2.repositories;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import jakarta.validation.ConstraintViolationException;
 import unlp.info.bd2.model.ItemService;
 import unlp.info.bd2.model.Purchase;
 import unlp.info.bd2.model.Review;
@@ -28,33 +26,16 @@ public class ToursRepositoryImpl implements ToursRepository {
     @Autowired
     private SessionFactory sessionFactory;
 
-    private static final Logger log = LoggerFactory.getLogger(ToursRepositoryImpl.class);
-
     //IVY
-    
-    public User saveOrUpdateUser(User user) throws ToursException{
+
+    public <T> T save(T persistableObject) throws ConstraintViolationException{
         Session session = sessionFactory.getCurrentSession();
-        User sameId = null;
-        if(!(user.getId() == null))
-            sameId = session.find(User.class, user.getId());
+        return session.merge(persistableObject);
+    }
 
-        if (user.getId() == null || Objects.isNull(sameId)) {
-            User sameUsernameUser = session.createQuery("FROM User u WHERE u.username = :username", User.class)
-                        .setParameter("username", user.getUsername())
-                        .uniqueResult();
-            if(sameUsernameUser == null){
-                session.persist(user);
-            }
-            else{
-                throw new ToursException("Tried to store repeated username"); //Could be handled in the service, unique-constraint exception
-            }
-        } else {
-
-            session.merge(user);
-        }
-        
-
-        return user;
+    public <T> void delete(T persistableObject){
+        Session session = sessionFactory.getCurrentSession();
+        session.remove(persistableObject);
     }
 
     public Optional<User> getUserById(Long id) { //Removed "throws TourException"; it doesn't make sense
@@ -71,40 +52,6 @@ public class ToursRepositoryImpl implements ToursRepository {
         return Optional.ofNullable(user);
     }
 
-    
-    public void deleteUser(Long id) throws ToursException{
-        Session session = sessionFactory.getCurrentSession();
-        User user = session.get(User.class, id);
-        if (user != null) {
-            try{
-                session.remove(user);
-            }
-            catch(IllegalStateException e){
-                session.merge(user);
-                if(e.getMessage() == "El usuario se encuentra desactivado" || e.getMessage() == "El usuario no puede ser desactivado"){
-                    throw new ToursException(e.getMessage()); //Can be handled in service, IllegalStateException
-                }
-            }
-        }
-        else{
-            throw new ToursException("Tried to delete non-existent user"); //Can maybe just be removed? Or handled in service if already exists
-        }
-    }
-
-    
-    public Stop saveOrUpdateStop(Stop stop){
-        Session session = sessionFactory.getCurrentSession();
-
-        if (stop.getId() == null || Objects.isNull(session.find(Stop.class, stop.getId()))) {
-            session.persist(stop);
-        } else {
-            session.merge(stop);
-        }
-        
-        
-        return stop;
-    }
-
     public List<Stop> getStopByNameStart(String name) {
         Session session = sessionFactory.getCurrentSession();
         List<Stop> stops = session.createQuery("FROM Stop s WHERE s.name LIKE :name", Stop.class)
@@ -115,17 +62,6 @@ public class ToursRepositoryImpl implements ToursRepository {
     }
     
     //FABRI
-    
-    public Route saveOrUpdateRoute(Route route) throws ToursException {
-        Session session = sessionFactory.getCurrentSession();
-        if (route.getId() == null || Objects.isNull(session.find(Route.class, route.getId()))) {
-            session.persist(route);
-        } else {
-            session.merge(route);
-        }
-        
-        return route;
-    }
     
     public Optional<Route> getRouteById(Long id){
         Session session = sessionFactory.getCurrentSession();
@@ -191,24 +127,6 @@ public class ToursRepositoryImpl implements ToursRepository {
         route.addTourGuide(tourGuide);
         tourGuide.addRoute(route);
         
-    }
-
-    
-    public Supplier saveOrUpdateSupplier(Supplier supplier) throws ToursException{
-        Session session = sessionFactory.getCurrentSession();
-        if (supplier.getId() == null || Objects.isNull(session.find(Supplier.class, supplier.getId()))) {
-            Supplier sameAuthorizationNumberSupplier = session.createQuery("FROM Supplier s WHERE s.authorizationNumber = :authorizationNumber", Supplier.class)
-                                .setParameter("authorizationNumber", supplier.getAuthorizationNumber())
-                                .uniqueResult();
-            if (sameAuthorizationNumberSupplier != null) {
-            throw new ToursException("Constraint Violation"); //Could be handled in service uniqueconstraintexception
-        }
-            session.persist(supplier);
-        } else {
-            session.merge(supplier);
-        }
-        
-        return supplier;
     }
 
     
@@ -282,14 +200,6 @@ public class ToursRepositoryImpl implements ToursRepository {
             return Optional.empty();
     }
     
-    
-    public Purchase savePurchase (Purchase purchase) throws ToursException {
-        Session session = sessionFactory.getCurrentSession();
-        session.persist(purchase);
-        return purchase;
-    }
-    
-    
     public ItemService addItemToPurchase(Service service, int quantity, Purchase purchase) throws ToursException {
         ItemService item = new ItemService(service, quantity, purchase);
         float price = quantity * service.getPrice();
@@ -308,17 +218,6 @@ public class ToursRepositoryImpl implements ToursRepository {
                             .uniqueResult();
                             
         return Optional.ofNullable(purchase);
-    }
-    
-    
-    public void deletePurchase(Purchase purchase) throws ToursException { //deberia funcionar gracias a la anotaciones en las clases
-        Session session = sessionFactory.getCurrentSession();
-        //session.clear(); // esto para consultar ¿por que anda con esto y sin esto no?
-        purchase.getUser().getPurchaseList().remove(purchase);
-        purchase.getRoute().getPurchases().remove(purchase);
-        purchase.getItemServiceList().clear();
-        
-        session.remove(purchase);
     }
     
     
@@ -468,7 +367,6 @@ public class ToursRepositoryImpl implements ToursRepository {
     }
     
     //FRANCO
-    //public List<Route> getTop3RoutesWithMaxAverageRating(){return null;} 
 
     public List<Route> getRoutesWithMinRating() {
         Session session = sessionFactory.getCurrentSession();
@@ -521,15 +419,4 @@ public class ToursRepositoryImpl implements ToursRepository {
                                         .list();
         return tgusers;
     }
-    /* Resguardo de la consulta con IN (decidí cambiarla por la eficiencia)
-        List<TourGuideUser> tgusers = session.createQuery(
-                                        "SELECT DISTINCT tguser " +
-                                        "FROM TourGuideUser tguser JOIN tguser.routes route " + 
-                                        "WHERE route IN (" +
-                                            "SELECT route " + 
-                                            "FROM Route route JOIN route.purchases purchase JOIN purchase.review review " + 
-                                            "WHERE review.rating = 1" +
-                                        ")", TourGuideUser.class)
-                                        .list();
-     */
 }

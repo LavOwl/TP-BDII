@@ -24,7 +24,7 @@ public class DriverUser extends User {
     @Column(name = "expedient", nullable = true)
     private String expedient;
 
-    @ManyToMany(mappedBy = "driverList", cascade = {CascadeType.REFRESH, CascadeType.DETACH})
+    @ManyToMany(mappedBy = "driverList", cascade = {})
     private List<Route> routes = new ArrayList<Route>();
 
     public DriverUser(String username, String password, String name, String email, Date birthdate, String phoneNumber,

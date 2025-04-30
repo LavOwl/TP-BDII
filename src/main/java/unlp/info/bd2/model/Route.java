@@ -14,6 +14,8 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
+import unlp.info.bd2.utils.ToursException;
+
 import java.util.ArrayList;
 import jakarta.persistence.FetchType;
 
@@ -50,7 +52,7 @@ public class Route {
     @JoinTable(name = "route_guide", joinColumns = @JoinColumn(name = "route_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "tourGuideUser_id"))
     private List<TourGuideUser> tourGuideList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "route", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "route", cascade = {}, orphanRemoval = true,fetch = FetchType.EAGER)
     private List<Purchase> purchases = new ArrayList<>();
 
     public Route() {
@@ -91,7 +93,12 @@ public class Route {
         //hasta aca la modificacion
     }
 
-    public void addPurchase(Purchase purchase) {
-        this.purchases.add(purchase);
+    public void addPurchase(Purchase purchase) throws ToursException {
+        if(this.purchases.size() < this.maxNumberUsers){
+            this.purchases.add(purchase);
+        }
+        else{
+            throw new ToursException("The route is full, you cannot add more purchases");
+        }
     }
 }

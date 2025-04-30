@@ -18,22 +18,18 @@ import unlp.info.bd2.model.Route;
 
 public interface ToursRepository {
     
-    //IVY
-    public User saveOrUpdateUser(User user) throws ToursException;
+    //Refactoring
+    public <T> T save(T persistableObject);
+    public <T> void delete(T persistableObject);
 
+    //IVY
     public Optional<User> getUserById(Long id);
 
     public Optional<User> getUserByUsername(String username);
 
-    public void deleteUser(Long id) throws ToursException;
-
-    public Stop saveOrUpdateStop(Stop stop);
-
     public List<Stop> getStopByNameStart(String name);
 
     //FABRI
-    public Route saveOrUpdateRoute(Route route) throws ToursException;
-
     public Optional<Route> getRouteById(Long id);
 
     public List<Route> getRoutesBelowPrice(float price);
@@ -41,8 +37,6 @@ public interface ToursRepository {
     public void assignDriverByUsername(String username, Long idRoute) throws ToursException;
 
     public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException;
-
-    public Supplier saveOrUpdateSupplier(Supplier supplier) throws ToursException;
 
     public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException;
 
@@ -68,18 +62,12 @@ public interface ToursRepository {
 
     /** Returns the Service that corresponds to the name of service and his supplier ID sent if it's exists */
     public Optional<Service> getServiceByNameAndSupplierId (String name, Long id) throws ToursException;
-
-    /** Save the Purchase sent in the BD */
-    public Purchase savePurchase (Purchase purchase) throws ToursException;
     
     /** Creates and add an ItemService in the Purchase given */
     public ItemService addItemToPurchase (Service service, int quantity, Purchase purchase) throws ToursException;
     
     /** Returns the Purchase by the code sent */
     public Optional<Purchase> getPurchaseByCode (String code);
-    
-    /** Deletes the Purchase given from the DB */
-    public void deletePurchase (Purchase purchase) throws ToursException;
     
     /** Creates and add a Review in the Purchase given */
     public Review addReviewToPurchase (int rating, String comment, Purchase purchase) throws ToursException;

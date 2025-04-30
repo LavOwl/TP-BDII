@@ -4,7 +4,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import jakarta.transaction.Transactional;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.transaction.annotation.Transactional;
+
 import jakarta.validation.constraints.NotNull;
 import unlp.info.bd2.model.DriverUser;
 import unlp.info.bd2.model.ItemService;
@@ -26,57 +28,83 @@ public class ToursServiceImpl implements ToursService {
         this.toursRepository = toursRepository;
     }
 
+    private User saveUser(User user) throws ToursException{
+        try{
+            return toursRepository.save(user);
+        }
+        catch (ConstraintViolationException c){
+            throw new ToursException("Constraint Violation");
+        }
+    }
+
     //IVY
     @Override
-     @Transactional
+    @Transactional
     public User createUser(@NotNull String username, @NotNull String password, @NotNull String fullName, @NotNull String email, @NotNull Date birthdate, @NotNull String phoneNumber) throws ToursException{
         User user = new User(username, password, fullName, email, birthdate, phoneNumber);
-        return toursRepository.saveOrUpdateUser(user);
+        return saveUser(user);
     }
+
     @Override
-     @Transactional
+    @Transactional
     public DriverUser createDriverUser(@NotNull String username, @NotNull String password, @NotNull String fullName, @NotNull String email, @NotNull Date birthdate, @NotNull String phoneNumber, @NotNull String expedient) throws ToursException{
         DriverUser user = new DriverUser(username, password, fullName, email, birthdate, phoneNumber, expedient);
-        return (DriverUser)toursRepository.saveOrUpdateUser(user);
+        return (DriverUser) saveUser(user);
     }
+    
     @Override
-     @Transactional
+    @Transactional
     public TourGuideUser createTourGuideUser(@NotNull String username, @NotNull String password, @NotNull String fullName, @NotNull String email, @NotNull Date birthdate, @NotNull String phoneNumber, @NotNull String education) throws ToursException{
         TourGuideUser user = new TourGuideUser(username, password, fullName, email, birthdate, phoneNumber, education);
-        toursRepository.saveOrUpdateUser(user);
-        return (TourGuideUser)toursRepository.saveOrUpdateUser(user);
+        return (TourGuideUser) saveUser(user);
     }
+
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public Optional<User> getUserById(Long id) throws ToursException{
         return toursRepository.getUserById(id);
     }
+
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public Optional<User> getUserByUsername(@NotNull String username) throws ToursException{
         return toursRepository.getUserByUsername(username);
     }
+
     @Override
-     @Transactional
+    @Transactional
     public User updateUser(@NotNull User user) throws ToursException{
-        return toursRepository.saveOrUpdateUser(user);
+        return toursRepository.save(user);
     }
+
     @Override
-     @Transactional
+    @Transactional
     public void deleteUser(@NotNull User user) throws ToursException{
-        toursRepository.deleteUser(user.getId());
+        try{
+            toursRepository.delete(user);
+        }
+        catch(IllegalStateException e){
+            if(e.getMessage() == "El usuario se encuentra desactivado" || e.getMessage() == "El usuario no puede ser desactivado"){
+                throw new ToursException(e.getMessage());
+            }
+            else{
+                toursRepository.save(user);
+            }
+        }
     }
+
     @Override
-     @Transactional
+    @Transactional
     public Stop createStop(@NotNull String name, @NotNull String description) throws ToursException{
         if(name.contains("_") || name.contains("%")){
             throw new ToursException("Cannot use '% or '_' in the name of a stop"); //Couldn't find an HQL function to avoid SQL injection, could manually map characters to /wildcard or similar, but would take too much time and effort.
         }
         Stop stop = new Stop(name, description);
-        return toursRepository.saveOrUpdateStop(stop);
+        return toursRepository.save(stop);
     }
+
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public List<Stop> getStopByNameStart(@NotNull String name) throws ToursException {
         if(name.contains("_") || name.contains("%")){
             throw new ToursException("Cannot use '% or '_' in the name of a stop"); //Couldn't find an HQL function to avoid SQL injection, could manually map characters to /wildcard or similar, but would take too much time and effort.
@@ -86,120 +114,129 @@ public class ToursServiceImpl implements ToursService {
     
     //FABRI
     @Override
-     @Transactional
+    @Transactional
     public Route createRoute(String name, float price, float totalKm, int maxNumberOfUsers, List<Stop> stops) throws ToursException{
         Route route = new Route(name, price, totalKm, maxNumberOfUsers, stops);
-        return toursRepository.saveOrUpdateRoute(route);
+        return toursRepository.save(route);
     }
+
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public Optional<Route> getRouteById(Long id) {
         return toursRepository.getRouteById(id);
     }
+
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public List<Route> getRoutesBelowPrice(float price){ // deberia chequear que no me entre como parametro un precio negativo? y que sean numeros?       
         return toursRepository.getRoutesBelowPrice(price);
     }
+
     @Override
-     @Transactional
+    @Transactional
     public void assignDriverByUsername(String username, Long idRoute) throws ToursException{
         toursRepository.assignDriverByUsername(username, idRoute);
     }
     @Override
-     @Transactional
+    @Transactional
     public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException{
         toursRepository.assignTourGuideByUsername(username, idRoute);
     }
-    @Override
-     @Transactional
-    public Supplier createSupplier(String businessName, String authorizationNumber) throws ToursException{
-        if(businessName.contains("_") || businessName.contains("%")){
-            throw new ToursException("Cannot use '% or '_' in the name of a supplier"); //Couldn't find an HQL function to avoid SQL injection, could manually map characters to /wildcard or similar, but would take too much time and effort.
-        }
-        Supplier supplier = new Supplier(businessName, authorizationNumber);
-        return toursRepository.saveOrUpdateSupplier(supplier);
+
+    private void checkString(String s) throws ToursException{
+        if(s.contains("_") || s.contains("%"))
+            throw new ToursException("Cannot use '% or '_' in the name of a supplier");
     }
+
     @Override
-     @Transactional
+    @Transactional
+    public Supplier createSupplier(String businessName, String authorizationNumber) throws ToursException{
+        checkString(businessName);
+        Supplier supplier = new Supplier(businessName, authorizationNumber);
+        try{
+            return toursRepository.save(supplier);
+        }
+        catch(ConstraintViolationException c){
+            throw new ToursException("Constraint Violation");
+        }
+    }
+
+    @Override
+    @Transactional
     public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException{
-        if(name.contains("_") || name.contains("%")){
-            throw new ToursException("Cannot use '% or '_' in the name of a service"); //Couldn't find an HQL function to avoid SQL injection, could manually map characters to /wildcard or similar, but would take too much time and effort.
-        }
-        if(description.contains("_") || description.contains("%")){
-            throw new ToursException("Cannot use '% or '_' in the description of a service"); //Couldn't find an HQL function to avoid SQL injection, could manually map characters to /wildcard or similar, but would take too much time and effort.
-        }
+        checkString(name);
+        checkString(description);
         return toursRepository.addServiceToSupplier(name, price, description, supplier);
     }
+
     @Override
-     @Transactional
+    @Transactional
     public Service updateServicePriceById(Long id, float newPrice) throws ToursException{
         return toursRepository.updateServicePriceById(id, newPrice);
     }
     
      //FRANCO
-     @Override
-      @Transactional
+    @Override
+    @Transactional(readOnly = true)
      public Optional<Supplier> getSupplierById (Long id) {
         return toursRepository.getSupplierById(id);
     }
+
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public Optional<Supplier> getSupplierByAuthorizationNumber (String authorizationNumber) {
         return toursRepository.getSupplierByAuthorizationNumber(authorizationNumber);
     }
+
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public Optional<Service> getServiceByNameAndSupplierId (String name, Long id) throws ToursException {
         return toursRepository.getServiceByNameAndSupplierId(name, id);
     }
 
-    private void checkPurchases(String code, Route route, User user) throws ToursException {
-        if (getPurchaseByCode(code).isPresent()) {
-            throw new ToursException("The purchase code already exists");
+    private Purchase savePurchase (Purchase purchase) throws ToursException {
+        try{
+            return toursRepository.save(purchase);
         }
-        if (route.getPurchases().size() >= route.getMaxNumberUsers()) {
-            throw new ToursException("The route is full, you cannot add more purchases");
+        catch (ConstraintViolationException c){
+            throw new ToursException("Constraint Violation");
         }
     }
-    
-    private void addRelationsToPurchase (Purchase purchase, Route route, User user) throws ToursException {
-        route.addPurchase(purchase);
-        user.addPurchase(purchase);
-    }
+
     @Override
-     @Transactional
+    @Transactional
     public Purchase createPurchase (String code, Route route, User user) throws ToursException {
-        checkPurchases(code, route, user);
-        Purchase purchase = new Purchase(code, route, user);
-        addRelationsToPurchase(purchase, route, user);
-        return toursRepository.savePurchase(purchase);
+        Purchase purchase = new Purchase(code, new Date(), route, user);
+        return savePurchase(purchase);
     }
+
     @Override
-     @Transactional
+    @Transactional
     public Purchase createPurchase (String code, Date date, Route route, User user) throws ToursException {
-        checkPurchases(code, route, user);
         Purchase purchase = new Purchase(code, date, route, user);
-        addRelationsToPurchase(purchase, route, user); // si lo descomento, ocurre stack overflow
-        return toursRepository.savePurchase(purchase);
+        return savePurchase(purchase);
     }
+
     @Override
-     @Transactional
+    @Transactional
     public ItemService addItemToPurchase (Service service, int quantity, Purchase purchase) throws ToursException {
         return toursRepository.addItemToPurchase(service, quantity, purchase);
     }
+
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public Optional<Purchase> getPurchaseByCode (String code) {
         return toursRepository.getPurchaseByCode(code);
     }
+
     @Override
-     @Transactional
+    @Transactional
     public void deletePurchase (Purchase purchase) throws ToursException {
-        toursRepository.deletePurchase(purchase);
+        toursRepository.delete(purchase);
     }
+
     @Override
-     @Transactional
+    @Transactional
     public Review addReviewToPurchase (int rating, String comment, Purchase purchase) throws ToursException {
         //supongo que el rating debe estar entre 0 y 10
         if (rating < 0 && rating > 10)
@@ -212,76 +249,76 @@ public class ToursServiceImpl implements ToursService {
 
     //IVY
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public List<Purchase> getAllPurchasesOfUsername(String username){
         return toursRepository.getAllPurchasesOfUsername(username);
     }
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public List<User> getUserSpendingMoreThan(float mount){
         return toursRepository.getUserSpendingMoreThan(mount);
     }
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public List<Supplier> getTopNSuppliersInPurchases(int n){
         return toursRepository.getTopNSuppliersInPurchases(n);
     }
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public List<Purchase> getTop10MoreExpensivePurchasesInServices(){
         return toursRepository.getTop10MoreExpensivePurchasesInServices();
     }
     
     //FABRI
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public List<User> getTop5UsersMorePurchases(){
         return toursRepository.getTop5UsersMorePurchases();
     }
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public long getCountOfPurchasesBetweenDates(Date start, Date end){
         return toursRepository.getCountOfPurchasesBetweenDates(start, end);
     }
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public List<Route> getRoutesWithStop(Stop stop){
         return toursRepository.getRoutesWithStop(stop);
     }
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public Long getMaxStopOfRoutes(){
         return toursRepository.getMaxStopOfRoutes();
     }
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public List<Route> getRoutsNotSell(){
         return toursRepository.getRoutsNotSell();
     }
     
     //FRANCO
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public List<Route> getTop3RoutesWithMaxRating() {
         return toursRepository.getTop3RoutesWithMaxAverageRating(); // Usa el que hizo Fabri
     }
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public List<Route> getRoutesWithMinRating() {
         return toursRepository.getRoutesWithMinRating();
     }
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public Service getMostDemandedService() {
         return toursRepository.getMostDemandedService();
     }
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public List<Service> getServiceNoAddedToPurchases() {
         return toursRepository.getServiceNoAddedToPurchases();
     }
     @Override
-     @Transactional
+    @Transactional(readOnly = true)
     public List<TourGuideUser> getTourGuidesWithRating1() {
         return toursRepository.getTourGuidesWithRating1();
     }

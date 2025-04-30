@@ -58,7 +58,7 @@ public class User {
     @Column(name = "active", nullable = false)
     private boolean active = true;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = {}, orphanRemoval = true)
     private List<Purchase> purchaseList = new ArrayList<Purchase>();
 
     public User(String username, String password, String name, String email, Date birthdate, String phoneNumber) {
@@ -86,9 +86,5 @@ public class User {
 
     public void addPurchase(Purchase purchase) {
         purchaseList.add(purchase);
-    }
-
-    public void desactivar() {
-        this.active = false;
     }
 }

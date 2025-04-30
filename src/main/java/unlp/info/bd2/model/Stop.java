@@ -28,7 +28,7 @@ public class Stop {
     @Column(name = "description", nullable = false, length = 1023) //Recheck length and nullability
     private String description;
 
-    @ManyToMany(mappedBy = "stops", cascade = {CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToMany(mappedBy = "stops", cascade = {})
     private List<Route> routes = new ArrayList<Route>();
 
     public Stop() {

@@ -33,10 +33,10 @@ public class Service {
     @Column(name = "description", nullable = false) //Recheck nullability
     private String description;
 
-    @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "service", cascade = {}, orphanRemoval = true)
     private List<ItemService> itemServiceList = new ArrayList<>();
 
-    @ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.DETACH})
+    @ManyToOne(cascade = {})
     @JoinColumn(name = "supplier_id", referencedColumnName = "id", nullable = false)
     private Supplier supplier;
 
