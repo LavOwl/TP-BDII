@@ -41,6 +41,7 @@ public class TourGuideUser extends User {
             this.routes = new ArrayList<Route>();
         }
         this.routes.add(route);
+        route.addTourGuide(this);
     }
 
     @Override

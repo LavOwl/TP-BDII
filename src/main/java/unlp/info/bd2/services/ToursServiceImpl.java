@@ -130,12 +130,26 @@ public class ToursServiceImpl implements ToursService {
     @Override
     @Transactional
     public void assignDriverByUsername(String username, Long idRoute) throws ToursException{
-        toursRepository.assignDriverByUsername(username, idRoute);
+        Optional<User> optionalDriverUser = toursRepository.getUserByUsername(username);
+        Optional<Route> optionalRoute = toursRepository.getById(Route.class, idRoute);
+        if(!optionalDriverUser.isPresent() || !optionalRoute.isPresent()){
+            throw new ToursException("Invalid username or id");
+        }
+        DriverUser driverUser = (DriverUser) optionalDriverUser.get();
+        driverUser.addRoute(optionalRoute.get());
+        toursRepository.save(driverUser);
     }
     @Override
     @Transactional
     public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException{
-        toursRepository.assignTourGuideByUsername(username, idRoute);
+        Optional<User> optionalTourGuideUser = toursRepository.getUserByUsername(username);
+        Optional<Route> optionalRoute = toursRepository.getById(Route.class, idRoute);
+        if(!optionalTourGuideUser.isPresent() || !optionalRoute.isPresent()){
+            throw new ToursException("Invalid username or id");
+        }
+        TourGuideUser tourGuideUser = (TourGuideUser) optionalTourGuideUser.get();
+        tourGuideUser.addRoute(optionalRoute.get());
+        toursRepository.save(tourGuideUser);
     }
 
     private void checkString(String s) throws ToursException{
@@ -320,22 +334,4 @@ public class ToursServiceImpl implements ToursService {
     public List<TourGuideUser> getTourGuidesWithRating1() {
         return toursRepository.getTourGuidesWithRating1();
     }
-
-    // No son necesarios, Spring ya lo hace, con parametrizar bien la consulta funciona
-    // Methods to validate data
-    /** Validates the String sent to use it in a query */
-    /*private boolean validateString (String str) {
-        if (str == null || str.length() > 255 || str.isBlank() || str.contains("_") || str.contains("%")) 
-            return false;
-    
-        return true;
-    }*/
-
-    /** Validates the Long sent to use it in a query */
-    /*private boolean validatesLong (Long number) {
-        if (number == null || number < 0)
-            return false;
-        
-        return true; 
-    }*/
 }

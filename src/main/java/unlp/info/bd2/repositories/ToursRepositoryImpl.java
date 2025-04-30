@@ -9,15 +9,12 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.validation.ConstraintViolationException;
-import unlp.info.bd2.model.ItemService;
 import unlp.info.bd2.model.Purchase;
-import unlp.info.bd2.model.Review;
 import unlp.info.bd2.model.Route;
 import unlp.info.bd2.model.Service;
 import unlp.info.bd2.model.Stop;
 import unlp.info.bd2.model.Supplier;
 import unlp.info.bd2.model.User;
-import unlp.info.bd2.model.DriverUser;
 import unlp.info.bd2.model.TourGuideUser;
 import unlp.info.bd2.utils.ToursException;
 
@@ -70,70 +67,6 @@ public class ToursRepositoryImpl implements ToursRepository {
         
         return routes;
      }
-
-     
-    public void assignDriverByUsername(String username, Long idRoute) throws ToursException{
-        Session session = sessionFactory.getCurrentSession();
-        DriverUser driver = session.createQuery("FROM DriverUser d WHERE d.username = :username", DriverUser.class)
-                                .setParameter("username", username)
-                                .uniqueResult();
-        Route route = session.find(Route.class, idRoute);
-        if (driver == null) {
-            
-            throw new ToursException("Tried to assign non-existent driver"); //Seems OK here
-        }
-        if (route == null) {
-            
-            throw new ToursException("Tried to assign driver to non-existent route"); //Seems OK here
-        }
-        if (route.getDriverList().contains(driver)) {
-            
-            throw new ToursException("Driver already assigned to route"); //Seems OK here
-        }
-        driver.addRoute(route);
-
-        session.merge(driver);        
-    }
-
-    
-    public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException{
-        Session session = sessionFactory.getCurrentSession();
-        TourGuideUser tourGuide = session.createQuery("FROM TourGuideUser t WHERE t.username = :username", TourGuideUser.class)
-                                .setParameter("username", username)
-                                .uniqueResult();
-        Route route = session.find(Route.class, idRoute);
-        if (tourGuide == null) {
-            
-            throw new ToursException("Tried to assign non-existent tour guide"); //Seems OK here
-        }
-        if (route == null) {
-            
-            throw new ToursException("Tried to assign tour guide to non-existent route"); //Seems OK here
-        }
-        if (route.getTourGuideList().contains(tourGuide)) {
-            
-            throw new ToursException("Tour guide already assigned to route"); //Seems OK here
-        }
-        route.addTourGuide(tourGuide);
-        tourGuide.addRoute(route);
-        
-    }
-
-    public Service updateServicePriceById(Long id, float newPrice) throws ToursException{
-        Session session = sessionFactory.getCurrentSession();
-        
-        Service service = session.find(Service.class, id);
-        if (service == null) {
-            
-            
-            throw new ToursException("Tried to update non-existent service"); //Seems OK here
-        }
-        service.setPrice(newPrice);
-        session.merge(service);
-        
-        
-        return service;
-    }
     
     //FRANCO
 
@@ -171,15 +104,6 @@ public class ToursRepositoryImpl implements ToursRepository {
                             
         return Optional.ofNullable(purchase);
     }
-    
-    
-    public Review addReviewToPurchase(int rating, String comment, Purchase purchase) throws ToursException {
-        Review review = purchase.addReview(rating, comment);
-        Session session = sessionFactory.getCurrentSession();
-        session.persist(review);
-        return review;
-    }
-
 
     //HQL SENTENCES
 

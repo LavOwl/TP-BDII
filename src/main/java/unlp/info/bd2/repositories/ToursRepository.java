@@ -4,9 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import unlp.info.bd2.model.ItemService;
 import unlp.info.bd2.model.Purchase;
-import unlp.info.bd2.model.Review;
 import unlp.info.bd2.model.Stop;
 import unlp.info.bd2.model.Supplier;
 import unlp.info.bd2.model.TourGuideUser;
@@ -31,10 +29,6 @@ public interface ToursRepository {
     //FABRI
 
     public List<Route> getRoutesBelowPrice(float price);
-
-    public void assignDriverByUsername(String username, Long idRoute) throws ToursException;
-
-    public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException;
 
     public List<User> getTop5UsersMorePurchases();
     
