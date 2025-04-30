@@ -8,6 +8,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.PreRemove;
 import lombok.Data;
@@ -20,10 +21,10 @@ import unlp.info.bd2.utils.ToursException;
 @DiscriminatorValue("tour_guide")
 public class TourGuideUser extends User {
 
-    @Column(name = "education", nullable = true) //Analyze later if it's actually nullable, or should be mandatory
+    @Column(name = "education", nullable = true)
     private String education;
 
-    @ManyToMany(mappedBy = "tourGuideList", cascade = {})
+    @ManyToMany(mappedBy = "tourGuideList", cascade = {}, fetch = FetchType.LAZY)
     private List<Route> routes = new ArrayList<Route>();
 
     public TourGuideUser(String username, String password, String name, String email, Date birthdate,

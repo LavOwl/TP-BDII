@@ -6,6 +6,7 @@ import java.util.List;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,10 +34,10 @@ public class Service {
     @Column(name = "description", nullable = false) //Recheck nullability
     private String description;
 
-    @OneToMany(mappedBy = "service", cascade = {}, orphanRemoval = true)
+    @OneToMany(mappedBy = "service", cascade = {}, orphanRemoval = true, fetch=FetchType.LAZY)
     private List<ItemService> itemServiceList = new ArrayList<>();
 
-    @ManyToOne(cascade = {CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.MERGE}, fetch=FetchType.LAZY)
     @JoinColumn(name = "supplier_id", referencedColumnName = "id", nullable = false)
     private Supplier supplier;
 

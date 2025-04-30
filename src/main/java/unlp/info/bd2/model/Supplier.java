@@ -6,6 +6,7 @@ import java.util.List;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,10 +27,10 @@ public class Supplier {
     @Column(name = "business_name", nullable = false, length = 255)
     private String businessName;
 
-    @Column(name = "authorization_number", nullable = false, length = 255, unique = true) //Verify length
+    @Column(name = "authorization_number", nullable = false, length = 255, unique = true)
     private String authorizationNumber;
 
-    @OneToMany(mappedBy = "supplier", cascade = {}, orphanRemoval = true)
+    @OneToMany(mappedBy = "supplier", cascade = {}, orphanRemoval = true, fetch=FetchType.LAZY)
     private List<Service> services = new ArrayList<>();
 
     public Supplier() {

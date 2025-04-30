@@ -40,15 +40,15 @@ public class Route {
     @Column(name = "max_number_users", nullable = false)
     private int maxNumberUsers;
 
-    @ManyToMany(cascade = {CascadeType.MERGE},fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {},fetch = FetchType.LAZY)
     @JoinTable(name = "route_stop", joinColumns = @JoinColumn(name = "route_id"), inverseJoinColumns = @JoinColumn(name = "stop_id"))
     private List<Stop> stops = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.MERGE},fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {},fetch = FetchType.LAZY)
     @JoinTable(name = "route_driver", joinColumns = @JoinColumn(name = "route_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "driverUser_id"))
     private List<DriverUser> driverList = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.MERGE},fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {},fetch = FetchType.LAZY)
     @JoinTable(name = "route_guide", joinColumns = @JoinColumn(name = "route_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "tourGuideUser_id"))
     private List<TourGuideUser> tourGuideList = new ArrayList<>();
 
