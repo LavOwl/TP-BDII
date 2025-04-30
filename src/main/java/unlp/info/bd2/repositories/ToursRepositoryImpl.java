@@ -38,10 +38,10 @@ public class ToursRepositoryImpl implements ToursRepository {
         session.remove(persistableObject);
     }
 
-    public Optional<User> getUserById(Long id) { //Removed "throws TourException"; it doesn't make sense
+    public <T> Optional<T> getById(Class<T> clazz, Long id){
         Session session = sessionFactory.getCurrentSession();
-        User user = session.find(User.class, id);
-        return Optional.ofNullable(user);
+        T persistableObject = session.find(clazz, id);
+        return Optional.ofNullable(persistableObject);
     }
 
     public Optional<User> getUserByUsername(String username){ //Removed "throws TourException"; it doesn't make sense
@@ -57,18 +57,10 @@ public class ToursRepositoryImpl implements ToursRepository {
         List<Stop> stops = session.createQuery("FROM Stop s WHERE s.name LIKE :name", Stop.class)
                                 .setParameter("name", name + "%")
                                 .list();
-        
         return stops;
     }
     
     //FABRI
-    
-    public Optional<Route> getRouteById(Long id){
-        Session session = sessionFactory.getCurrentSession();
-        Route route = session.find(Route.class, id);
-        
-        return Optional.ofNullable(route);
-    }
 
     public List<Route> getRoutesBelowPrice(float price){
         Session session = sessionFactory.getCurrentSession();
@@ -98,11 +90,9 @@ public class ToursRepositoryImpl implements ToursRepository {
             
             throw new ToursException("Driver already assigned to route"); //Seems OK here
         }
-        route.addDriver(driver);
         driver.addRoute(route);
-        //session.merge(driver); // Son necesarios estos merge?
-        //session.merge(route); // 
-        
+
+        session.merge(driver);        
     }
 
     
@@ -129,27 +119,6 @@ public class ToursRepositoryImpl implements ToursRepository {
         
     }
 
-    
-    public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException{
-        Session session = sessionFactory.getCurrentSession();
-        if (supplier == null) {
-            
-            
-            throw new ToursException("Tried to add service to non-existent supplier"); //Can be handled in service
-        }
-        if (name == null || description == null) {
-            
-            
-            throw new ToursException("Cannot use null in the name or description of a service");  //Can be handled in service
-        }
-        Service service = new Service(name, price, description, supplier);
-
-        session.persist(service);
-        supplier.addService(service);
-        
-        
-        return service;
-    }
     public Service updateServicePriceById(Long id, float newPrice) throws ToursException{
         Session session = sessionFactory.getCurrentSession();
         
@@ -167,12 +136,6 @@ public class ToursRepositoryImpl implements ToursRepository {
     }
     
     //FRANCO
-    public Optional<Supplier> getSupplierById(Long id) {
-        Session session = sessionFactory.getCurrentSession();
-        Supplier supplier = session.find(Supplier.class, id);
-
-        return Optional.ofNullable(supplier);
-    }
 
     public Optional<Supplier> getSupplierByAuthorizationNumber(String authorizationNumber) {
         Session session = sessionFactory.getCurrentSession();
@@ -198,17 +161,6 @@ public class ToursRepositoryImpl implements ToursRepository {
             return Optional.of(services.get(0));
         else
             return Optional.empty();
-    }
-    
-    public ItemService addItemToPurchase(Service service, int quantity, Purchase purchase) throws ToursException {
-        ItemService item = new ItemService(service, quantity, purchase);
-        float price = quantity * service.getPrice();
-        purchase.addItem(item, price);
-        service.addItemService(item);
-
-        Session session = sessionFactory.getCurrentSession();
-        session.persist(item);
-        return item;
     }
     
     public Optional<Purchase> getPurchaseByCode(String code) {

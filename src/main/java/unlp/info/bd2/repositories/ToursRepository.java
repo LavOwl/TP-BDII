@@ -21,26 +21,20 @@ public interface ToursRepository {
     //Refactoring
     public <T> T save(T persistableObject);
     public <T> void delete(T persistableObject);
+    public <T> Optional<T> getById(Class<T> clazz, Long id);
 
     //IVY
-    public Optional<User> getUserById(Long id);
-
     public Optional<User> getUserByUsername(String username);
 
     public List<Stop> getStopByNameStart(String name);
 
     //FABRI
-    public Optional<Route> getRouteById(Long id);
 
     public List<Route> getRoutesBelowPrice(float price);
 
     public void assignDriverByUsername(String username, Long idRoute) throws ToursException;
 
     public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException;
-
-    public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException;
-
-    public Service updateServicePriceById(Long id, float newPrice) throws ToursException;
 
     public List<User> getTop5UsersMorePurchases();
     
@@ -54,8 +48,6 @@ public interface ToursRepository {
 
 
     //FRANCO
-    /** Returns the Supplier of the ID sent if it's exists. */
-    public Optional<Supplier> getSupplierById (Long id);
 
     /** Returns the Supplier of the Authorization Number sent if it's exists. */
     public Optional<Supplier> getSupplierByAuthorizationNumber (String authorizationNumber);
@@ -63,14 +55,8 @@ public interface ToursRepository {
     /** Returns the Service that corresponds to the name of service and his supplier ID sent if it's exists */
     public Optional<Service> getServiceByNameAndSupplierId (String name, Long id) throws ToursException;
     
-    /** Creates and add an ItemService in the Purchase given */
-    public ItemService addItemToPurchase (Service service, int quantity, Purchase purchase) throws ToursException;
-    
     /** Returns the Purchase by the code sent */
     public Optional<Purchase> getPurchaseByCode (String code);
-    
-    /** Creates and add a Review in the Purchase given */
-    public Review addReviewToPurchase (int rating, String comment, Purchase purchase) throws ToursException;
 
     //HQL SENTENCES
 

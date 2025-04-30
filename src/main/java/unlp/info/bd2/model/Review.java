@@ -29,7 +29,7 @@ public class Review {
     @Column(name = "comment", nullable = true, length = 1023) //Recheck nullability and length
     private String comment;
 
-    @OneToOne(cascade = {}) //Cascading other operations can lead to infinite loops.
+    @OneToOne(cascade = {CascadeType.MERGE}) //Cascading other operations can lead to infinite loops.
     @JoinColumn(name = "purchase_id", referencedColumnName = "id", nullable = false)
     private Purchase purchase;
 
@@ -38,6 +38,7 @@ public class Review {
         this.rating = rating;
         this.comment = comment;
         this.purchase = purchase;
+        this.purchase.setReview(this);
     }
 
     public Review(){

@@ -9,6 +9,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.PreRemove;
 import lombok.Data;
@@ -24,7 +25,7 @@ public class DriverUser extends User {
     @Column(name = "expedient", nullable = true)
     private String expedient;
 
-    @ManyToMany(mappedBy = "driverList", cascade = {})
+    @ManyToMany(mappedBy = "driverList", cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
     private List<Route> routes = new ArrayList<Route>();
 
     public DriverUser(String username, String password, String name, String email, Date birthdate, String phoneNumber,
@@ -46,6 +47,7 @@ public class DriverUser extends User {
             this.routes = new ArrayList<Route>();
         }
         this.routes.add(route);
+        route.addDriver(this);
     }
 
     @Override

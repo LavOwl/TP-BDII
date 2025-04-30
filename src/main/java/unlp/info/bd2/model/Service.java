@@ -36,7 +36,7 @@ public class Service {
     @OneToMany(mappedBy = "service", cascade = {}, orphanRemoval = true)
     private List<ItemService> itemServiceList = new ArrayList<>();
 
-    @ManyToOne(cascade = {})
+    @ManyToOne(cascade = {CascadeType.MERGE})
     @JoinColumn(name = "supplier_id", referencedColumnName = "id", nullable = false)
     private Supplier supplier;
 
@@ -49,6 +49,7 @@ public class Service {
         this.price = price;
         this.description = description;
         this.supplier = supplier;
+        this.supplier.addService(this);
     }
     public void addItemService(ItemService itemService) {
         this.itemServiceList.add(itemService);

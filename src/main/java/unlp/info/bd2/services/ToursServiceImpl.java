@@ -41,28 +41,25 @@ public class ToursServiceImpl implements ToursService {
     @Override
     @Transactional
     public User createUser(@NotNull String username, @NotNull String password, @NotNull String fullName, @NotNull String email, @NotNull Date birthdate, @NotNull String phoneNumber) throws ToursException{
-        User user = new User(username, password, fullName, email, birthdate, phoneNumber);
-        return saveUser(user);
+        return saveUser(new User(username, password, fullName, email, birthdate, phoneNumber));
     }
 
     @Override
     @Transactional
     public DriverUser createDriverUser(@NotNull String username, @NotNull String password, @NotNull String fullName, @NotNull String email, @NotNull Date birthdate, @NotNull String phoneNumber, @NotNull String expedient) throws ToursException{
-        DriverUser user = new DriverUser(username, password, fullName, email, birthdate, phoneNumber, expedient);
-        return (DriverUser) saveUser(user);
+        return (DriverUser) saveUser(new DriverUser(username, password, fullName, email, birthdate, phoneNumber, expedient));
     }
-    
+
     @Override
     @Transactional
     public TourGuideUser createTourGuideUser(@NotNull String username, @NotNull String password, @NotNull String fullName, @NotNull String email, @NotNull Date birthdate, @NotNull String phoneNumber, @NotNull String education) throws ToursException{
-        TourGuideUser user = new TourGuideUser(username, password, fullName, email, birthdate, phoneNumber, education);
-        return (TourGuideUser) saveUser(user);
+        return (TourGuideUser) saveUser(new TourGuideUser(username, password, fullName, email, birthdate, phoneNumber, education));
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<User> getUserById(Long id) throws ToursException{
-        return toursRepository.getUserById(id);
+        return toursRepository.getById(User.class, id);
     }
 
     @Override
@@ -84,7 +81,7 @@ public class ToursServiceImpl implements ToursService {
             toursRepository.delete(user);
         }
         catch(IllegalStateException e){
-            if(e.getMessage() == "El usuario se encuentra desactivado" || e.getMessage() == "El usuario no puede ser desactivado"){
+            if("El usuario se encuentra desactivado".equals(e.getMessage()) || "El usuario no puede ser desactivado".equals(e.getMessage())){
                 throw new ToursException(e.getMessage());
             }
             else{
@@ -99,8 +96,7 @@ public class ToursServiceImpl implements ToursService {
         if(name.contains("_") || name.contains("%")){
             throw new ToursException("Cannot use '% or '_' in the name of a stop"); //Couldn't find an HQL function to avoid SQL injection, could manually map characters to /wildcard or similar, but would take too much time and effort.
         }
-        Stop stop = new Stop(name, description);
-        return toursRepository.save(stop);
+        return toursRepository.save(new Stop(name, description));
     }
 
     @Override
@@ -116,14 +112,13 @@ public class ToursServiceImpl implements ToursService {
     @Override
     @Transactional
     public Route createRoute(String name, float price, float totalKm, int maxNumberOfUsers, List<Stop> stops) throws ToursException{
-        Route route = new Route(name, price, totalKm, maxNumberOfUsers, stops);
-        return toursRepository.save(route);
+        return toursRepository.save(new Route(name, price, totalKm, maxNumberOfUsers, stops));
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<Route> getRouteById(Long id) {
-        return toursRepository.getRouteById(id);
+        return toursRepository.getById(Route.class, id);
     }
 
     @Override
@@ -152,9 +147,8 @@ public class ToursServiceImpl implements ToursService {
     @Transactional
     public Supplier createSupplier(String businessName, String authorizationNumber) throws ToursException{
         checkString(businessName);
-        Supplier supplier = new Supplier(businessName, authorizationNumber);
         try{
-            return toursRepository.save(supplier);
+            return toursRepository.save(new Supplier(businessName, authorizationNumber));
         }
         catch(ConstraintViolationException c){
             throw new ToursException("Constraint Violation");
@@ -166,20 +160,26 @@ public class ToursServiceImpl implements ToursService {
     public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException{
         checkString(name);
         checkString(description);
-        return toursRepository.addServiceToSupplier(name, price, description, supplier);
+        return toursRepository.save(new Service(name, price, description, supplier));
     }
 
     @Override
     @Transactional
     public Service updateServicePriceById(Long id, float newPrice) throws ToursException{
-        return toursRepository.updateServicePriceById(id, newPrice);
+        Optional<Service> optionalService = toursRepository.getById(Service.class, id);
+        if(!optionalService.isPresent()){
+            throw new ToursException("Service does not exist");
+        }
+        Service service = optionalService.get();
+        service.setPrice(newPrice);
+        return toursRepository.save(service);
     }
     
      //FRANCO
     @Override
     @Transactional(readOnly = true)
      public Optional<Supplier> getSupplierById (Long id) {
-        return toursRepository.getSupplierById(id);
+        return toursRepository.getById(Supplier.class, id);
     }
 
     @Override
@@ -206,21 +206,19 @@ public class ToursServiceImpl implements ToursService {
     @Override
     @Transactional
     public Purchase createPurchase (String code, Route route, User user) throws ToursException {
-        Purchase purchase = new Purchase(code, new Date(), route, user);
-        return savePurchase(purchase);
+        return savePurchase(new Purchase(code, new Date(), route, user));
     }
 
     @Override
     @Transactional
     public Purchase createPurchase (String code, Date date, Route route, User user) throws ToursException {
-        Purchase purchase = new Purchase(code, date, route, user);
-        return savePurchase(purchase);
+        return savePurchase(new Purchase(code, date, route, user));
     }
 
     @Override
     @Transactional
     public ItemService addItemToPurchase (Service service, int quantity, Purchase purchase) throws ToursException {
-        return toursRepository.addItemToPurchase(service, quantity, purchase);
+        return toursRepository.save(new ItemService(service, quantity, purchase));
     }
 
     @Override
@@ -242,7 +240,7 @@ public class ToursServiceImpl implements ToursService {
         if (rating < 0 && rating > 10)
             throw new ToursException("The rating of the review must be between 0 and 10");
             
-        return toursRepository.addReviewToPurchase(rating, comment, purchase);
+        return toursRepository.save(new Review(rating, comment, purchase));
     }
 
     // CONSULTAS HQL

@@ -8,6 +8,7 @@ import java.util.Objects;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -45,10 +46,10 @@ public class Purchase {
     @JoinColumn(name = "route_id", referencedColumnName = "id", nullable = false)
     private Route route;
 
-    @OneToOne(mappedBy = "purchase", cascade = {}, orphanRemoval = true)
+    @OneToOne(mappedBy = "purchase", cascade = {CascadeType.REMOVE}, orphanRemoval = true)
     private Review review;
 
-    @OneToMany(mappedBy = "purchase", cascade = {}, orphanRemoval = true)
+    @OneToMany(mappedBy = "purchase", cascade = {CascadeType.REMOVE}, orphanRemoval = true, fetch=FetchType.EAGER)
     private List<ItemService> itemServiceList = new ArrayList<ItemService>();
 
     public Purchase (String code, Date date, Route route, User user) throws ToursException {
@@ -65,9 +66,9 @@ public class Purchase {
         
     }
 
-    public void addItem (ItemService item, float price) {
+    public void addItem (ItemService item) {
         this.itemServiceList.add(item);
-        this.totalPrice += price;
+        this.totalPrice += item.calculatePrice();
     }
 
     public Review addReview (int rating, String comment) {

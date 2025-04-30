@@ -40,19 +40,19 @@ public class Route {
     @Column(name = "max_number_users", nullable = false)
     private int maxNumberUsers;
 
-    @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.DETACH, CascadeType.MERGE},fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.MERGE},fetch = FetchType.LAZY)
     @JoinTable(name = "route_stop", joinColumns = @JoinColumn(name = "route_id"), inverseJoinColumns = @JoinColumn(name = "stop_id"))
     private List<Stop> stops = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.DETACH, CascadeType.MERGE},fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.MERGE},fetch = FetchType.LAZY)
     @JoinTable(name = "route_driver", joinColumns = @JoinColumn(name = "route_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "driverUser_id"))
     private List<DriverUser> driverList = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.DETACH, CascadeType.MERGE},fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.MERGE},fetch = FetchType.LAZY)
     @JoinTable(name = "route_guide", joinColumns = @JoinColumn(name = "route_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "tourGuideUser_id"))
     private List<TourGuideUser> tourGuideList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "route", cascade = {}, orphanRemoval = true,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "route", cascade = {}, orphanRemoval = true,fetch = FetchType.LAZY)
     private List<Purchase> purchases = new ArrayList<>();
 
     public Route() {
@@ -68,29 +68,19 @@ public class Route {
     }
 
     public void addDriver(DriverUser driver){
-        //modifique aca
-
-        // Check if the driver is already in the list to avoid duplicates
         if (this.driverList.contains(driver)) {
             return;
         }
-        // Add the driver to the list and set the route reference in the driver
-        this.driverList.add(driver);
 
-        //hasta aca la modificacion
+        this.driverList.add(driver);
     }
 
     public void addTourGuide(TourGuideUser tourGuide){
-        //modifique aca
-
-        // Check if the tour guide is already in the list to avoid duplicates
         if (this.tourGuideList.contains(tourGuide)) {
             return;
         }
-        // Add the tour guide to the list and set the route reference in the tour guide
+
         this.tourGuideList.add(tourGuide);
-        
-        //hasta aca la modificacion
     }
 
     public void addPurchase(Purchase purchase) throws ToursException {
