@@ -23,11 +23,11 @@ public class ItemService {
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToOne //(cascade = {CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "purchase_id", referencedColumnName = "id", nullable = false)
     private Purchase purchase;
 
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToOne //(cascade = {CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "service_id", referencedColumnName = "id", nullable = false)
     private Service service;
 

@@ -167,6 +167,7 @@ public class ToursRepositoryImpl implements ToursRepository {
         //session.merge(driver); // Son necesarios estos merge?
         //session.merge(route); // 
         
+        //respondo a la pregunta: es el mismo caso que en updateServicePriceById
     }
 
     
@@ -214,22 +215,13 @@ public class ToursRepositoryImpl implements ToursRepository {
     
     public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException{
         Session session = sessionFactory.getCurrentSession();
-        if (supplier == null) {
-            
-            
-            throw new ToursException("Tried to add service to non-existent supplier"); //Can be handled in service
-        }
-        if (name == null || description == null) {
-            
-            
-            throw new ToursException("Cannot use null in the name or description of a service");  //Can be handled in service
-        }
         Service service = new Service(name, price, description, supplier);
-
         session.persist(service);
         supplier.addService(service);
-        
-        
+        //session.merge(supplier); //funciona sin el merge porque aparentemente, al momento de agregar, 
+                                    //hibernate lo sigue manejando todavía porque hace una cantidad x de 
+                                    //tiempo (desconocida) se fue a buscar. Pero si no fuera por eso, habria 
+                                    //que hacer merge. Se lo deja asi o hay que agregarlo por las dudas?
         return service;
     }
     public Service updateServicePriceById(Long id, float newPrice) throws ToursException{
@@ -242,7 +234,10 @@ public class ToursRepositoryImpl implements ToursRepository {
             throw new ToursException("Tried to update non-existent service"); //Seems OK here
         }
         service.setPrice(newPrice);
-        session.merge(service);
+        //session.merge(service); //funciona ahora y con el merge (antes tenia el merge), lo comenté porque es 
+                                    //el mismo caso que el método de arriba, solo que acá se podría decir que 
+                                    //es más confiable porque se lo buscó a la BD "hace menos tiempo" que en 
+                                    //el metodo anterior. Lo ponemos por las dudas o lo dejamos así?
         
         
         return service;
@@ -290,11 +285,11 @@ public class ToursRepositoryImpl implements ToursRepository {
     }
     
     
-    public ItemService addItemToPurchase(Service service, int quantity, Purchase purchase) throws ToursException {
-        ItemService item = new ItemService(service, quantity, purchase);
+    public ItemService addItemToPurchase(ItemService item)/*(Service service, int quantity, Purchase purchase) throws ToursException*/ {
+        /*ItemService item = new ItemService(service, quantity, purchase);
         float price = quantity * service.getPrice();
         purchase.addItem(item, price);
-        service.addItemService(item);
+        service.addItemService(item);*/ //lo lleve al servicio, es logica de negocio a mi entender
 
         Session session = sessionFactory.getCurrentSession();
         session.persist(item);
@@ -314,9 +309,9 @@ public class ToursRepositoryImpl implements ToursRepository {
     public void deletePurchase(Purchase purchase) throws ToursException { //deberia funcionar gracias a la anotaciones en las clases
         Session session = sessionFactory.getCurrentSession();
         //session.clear(); // esto para consultar ¿por que anda con esto y sin esto no?
-        purchase.getUser().getPurchaseList().remove(purchase);
-        purchase.getRoute().getPurchases().remove(purchase);
-        purchase.getItemServiceList().clear();
+        //purchase.getUser().getPurchaseList().remove(purchase);
+        //purchase.getRoute().getPurchases().remove(purchase);
+        //purchase.getItemServiceList().clear();
         
         session.remove(purchase);
     }
@@ -533,4 +528,3 @@ public class ToursRepositoryImpl implements ToursRepository {
                                         .list();
      */
 }
-

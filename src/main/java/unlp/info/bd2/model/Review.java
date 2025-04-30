@@ -29,7 +29,7 @@ public class Review {
     @Column(name = "comment", nullable = true, length = 1023) //Recheck nullability and length
     private String comment;
 
-    @OneToOne(cascade = {CascadeType.REFRESH, CascadeType.DETACH}) //Cascading other operations can lead to infinite loops.
+    @OneToOne //(cascade = {CascadeType.REFRESH, CascadeType.DETACH}) //Cascading other operations can lead to infinite loops.
     @JoinColumn(name = "purchase_id", referencedColumnName = "id", nullable = false)
     private Purchase purchase;
 

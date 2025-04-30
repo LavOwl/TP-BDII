@@ -23,7 +23,7 @@ public class TourGuideUser extends User {
     @Column(name = "education", nullable = true) //Analyze later if it's actually nullable, or should be mandatory
     private String education;
 
-    @ManyToMany(mappedBy = "tourGuideList", cascade = {CascadeType.REFRESH, CascadeType.DETACH})
+    @ManyToMany(mappedBy = "tourGuideList"/*, cascade = {CascadeType.REFRESH, CascadeType.DETACH}*/)
     private List<Route> routes = new ArrayList<Route>();
 
     public TourGuideUser(String username, String password, String name, String email, Date birthdate,

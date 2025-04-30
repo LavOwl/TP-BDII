@@ -123,6 +123,12 @@ public class ToursServiceImpl implements ToursService {
     @Override
      @Transactional
     public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException{
+        if (supplier == null) {
+            throw new ToursException("Tried to add service to non-existent supplier");
+        }
+        if (name == null || description == null) {
+            throw new ToursException("Cannot use null in the name or description of a service");
+        }
         if(name.contains("_") || name.contains("%")){
             throw new ToursException("Cannot use '% or '_' in the name of a service"); //Couldn't find an HQL function to avoid SQL injection, could manually map characters to /wildcard or similar, but would take too much time and effort.
         }
@@ -186,7 +192,12 @@ public class ToursServiceImpl implements ToursService {
     @Override
      @Transactional
     public ItemService addItemToPurchase (Service service, int quantity, Purchase purchase) throws ToursException {
-        return toursRepository.addItemToPurchase(service, quantity, purchase);
+        ItemService item = new ItemService(service, quantity, purchase);
+        float price = quantity * service.getPrice();
+        purchase.addItem(item, price);
+        service.addItemService(item);
+        return toursRepository.addItemToPurchase(item);
+        //return toursRepository.addItemToPurchase(service, quantity, purchase);
     }
     @Override
      @Transactional

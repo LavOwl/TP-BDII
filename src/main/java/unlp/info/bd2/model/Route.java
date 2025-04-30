@@ -38,19 +38,19 @@ public class Route {
     @Column(name = "max_number_users", nullable = false)
     private int maxNumberUsers;
 
-    @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.DETACH, CascadeType.MERGE},fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.MERGE}/*{CascadeType.REFRESH, CascadeType.DETACH, CascadeType.MERGE}*/,fetch = FetchType.EAGER)
     @JoinTable(name = "route_stop", joinColumns = @JoinColumn(name = "route_id"), inverseJoinColumns = @JoinColumn(name = "stop_id"))
     private List<Stop> stops = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.DETACH, CascadeType.MERGE},fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.MERGE}/*{CascadeType.REFRESH, CascadeType.DETACH, CascadeType.MERGE}*/,fetch = FetchType.EAGER)
     @JoinTable(name = "route_driver", joinColumns = @JoinColumn(name = "route_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "driverUser_id"))
     private List<DriverUser> driverList = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.DETACH, CascadeType.MERGE},fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.MERGE}/*{CascadeType.REFRESH, CascadeType.DETACH, CascadeType.MERGE}*/,fetch = FetchType.EAGER)
     @JoinTable(name = "route_guide", joinColumns = @JoinColumn(name = "route_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "tourGuideUser_id"))
     private List<TourGuideUser> tourGuideList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "route", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "route", cascade = CascadeType.MERGE, orphanRemoval = true,fetch = FetchType.EAGER)
     private List<Purchase> purchases = new ArrayList<>();
 
     public Route() {

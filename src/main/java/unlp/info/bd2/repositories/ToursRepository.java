@@ -73,8 +73,9 @@ public interface ToursRepository {
     public Purchase savePurchase (Purchase purchase) throws ToursException;
     
     /** Creates and add an ItemService in the Purchase given */
-    public ItemService addItemToPurchase (Service service, int quantity, Purchase purchase) throws ToursException;
-    
+    //public ItemService addItemToPurchase (Service service, int quantity, Purchase purchase) throws ToursException;
+    public ItemService addItemToPurchase (ItemService item) throws ToursException;
+
     /** Returns the Purchase by the code sent */
     public Optional<Purchase> getPurchaseByCode (String code);
     

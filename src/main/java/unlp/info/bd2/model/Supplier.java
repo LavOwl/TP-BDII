@@ -29,7 +29,7 @@ public class Supplier {
     @Column(name = "authorization_number", nullable = false, length = 255, unique = true) //Verify length
     private String authorizationNumber;
 
-    @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "supplier", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
     private List<Service> services = new ArrayList<>();
 
     public Supplier() {
