@@ -30,21 +30,23 @@ public class ToursServiceImpl implements ToursService {
     @Override
      @Transactional
     public User createUser(@NotNull String username, @NotNull String password, @NotNull String fullName, @NotNull String email, @NotNull Date birthdate, @NotNull String phoneNumber) throws ToursException{
+        if (!(toursRepository.getUserByUsername(username).isEmpty())) {
+            throw new ToursException("Tried to store repeated username");
+        }
         User user = new User(username, password, fullName, email, birthdate, phoneNumber);
-        return toursRepository.saveOrUpdateUser(user);
+        return (User) toursRepository.saveNewObject(user);
     }
     @Override
      @Transactional
     public DriverUser createDriverUser(@NotNull String username, @NotNull String password, @NotNull String fullName, @NotNull String email, @NotNull Date birthdate, @NotNull String phoneNumber, @NotNull String expedient) throws ToursException{
         DriverUser user = new DriverUser(username, password, fullName, email, birthdate, phoneNumber, expedient);
-        return (DriverUser)toursRepository.saveOrUpdateUser(user);
+        return (DriverUser) toursRepository.saveNewObject(user);
     }
     @Override
      @Transactional
     public TourGuideUser createTourGuideUser(@NotNull String username, @NotNull String password, @NotNull String fullName, @NotNull String email, @NotNull Date birthdate, @NotNull String phoneNumber, @NotNull String education) throws ToursException{
         TourGuideUser user = new TourGuideUser(username, password, fullName, email, birthdate, phoneNumber, education);
-        toursRepository.saveOrUpdateUser(user);
-        return (TourGuideUser)toursRepository.saveOrUpdateUser(user);
+        return (TourGuideUser) toursRepository.saveNewObject(user);
     }
     @Override
      @Transactional
@@ -59,7 +61,7 @@ public class ToursServiceImpl implements ToursService {
     @Override
      @Transactional
     public User updateUser(@NotNull User user) throws ToursException{
-        return toursRepository.saveOrUpdateUser(user);
+        return (User) toursRepository.updateObject(user);
     }
     @Override
      @Transactional
@@ -73,7 +75,7 @@ public class ToursServiceImpl implements ToursService {
             throw new ToursException("Cannot use '% or '_' in the name of a stop"); //Couldn't find an HQL function to avoid SQL injection, could manually map characters to /wildcard or similar, but would take too much time and effort.
         }
         Stop stop = new Stop(name, description);
-        return toursRepository.saveOrUpdateStop(stop);
+        return (Stop) toursRepository.saveNewObject(stop);
     }
     @Override
      @Transactional
@@ -89,7 +91,7 @@ public class ToursServiceImpl implements ToursService {
      @Transactional
     public Route createRoute(String name, float price, float totalKm, int maxNumberOfUsers, List<Stop> stops) throws ToursException{
         Route route = new Route(name, price, totalKm, maxNumberOfUsers, stops);
-        return toursRepository.saveOrUpdateRoute(route);
+        return (Route) toursRepository.saveNewObject(route);
     }
     @Override
      @Transactional
@@ -117,8 +119,11 @@ public class ToursServiceImpl implements ToursService {
         if(businessName.contains("_") || businessName.contains("%")){
             throw new ToursException("Cannot use '% or '_' in the name of a supplier"); //Couldn't find an HQL function to avoid SQL injection, could manually map characters to /wildcard or similar, but would take too much time and effort.
         }
+        if (!(toursRepository.getSupplierByAuthorizationNumber(authorizationNumber).isEmpty())) {
+            throw new ToursException("Constraint Violation");
+        }
         Supplier supplier = new Supplier(businessName, authorizationNumber);
-        return toursRepository.saveOrUpdateSupplier(supplier);
+        return (Supplier) toursRepository.saveNewObject(supplier);
     }
     @Override
      @Transactional
@@ -140,7 +145,13 @@ public class ToursServiceImpl implements ToursService {
     @Override
      @Transactional
     public Service updateServicePriceById(Long id, float newPrice) throws ToursException{
-        return toursRepository.updateServicePriceById(id, newPrice);
+        Optional<Service> service = toursRepository.getServiceById(id);
+        if (service.isEmpty()) {
+            throw new ToursException("Tried to update non-existent service");
+        }
+        service.get().setPrice(newPrice);
+        return (Service) toursRepository.updateObject(service.get());
+        //return toursRepository.updateServicePriceById(id, newPrice);
     }
     
      //FRANCO
@@ -179,7 +190,7 @@ public class ToursServiceImpl implements ToursService {
         checkPurchases(code, route, user);
         Purchase purchase = new Purchase(code, route, user);
         addRelationsToPurchase(purchase, route, user);
-        return toursRepository.savePurchase(purchase);
+        return (Purchase) toursRepository.saveNewObject(purchase);
     }
     @Override
      @Transactional
@@ -187,7 +198,7 @@ public class ToursServiceImpl implements ToursService {
         checkPurchases(code, route, user);
         Purchase purchase = new Purchase(code, date, route, user);
         addRelationsToPurchase(purchase, route, user); // si lo descomento, ocurre stack overflow
-        return toursRepository.savePurchase(purchase);
+        return (Purchase) toursRepository.saveNewObject(purchase);
     }
     @Override
      @Transactional

@@ -17,9 +17,15 @@ import unlp.info.bd2.model.Service;
 import unlp.info.bd2.model.Route;
 
 public interface ToursRepository {
+
+    /** Persists in the Database the object sent */
+    public Object saveNewObject (Object newObject);
+
+    /** Updates in the Database the object sent */
+    public Object updateObject (Object updatedObject);
     
     //IVY
-    public User saveOrUpdateUser(User user) throws ToursException;
+    //public User saveOrUpdateUser(User user) throws ToursException;
 
     public Optional<User> getUserById(Long id);
 
@@ -27,12 +33,12 @@ public interface ToursRepository {
 
     public void deleteUser(Long id) throws ToursException;
 
-    public Stop saveOrUpdateStop(Stop stop);
+    //public Stop saveOrUpdateStop(Stop stop);
 
     public List<Stop> getStopByNameStart(String name);
 
     //FABRI
-    public Route saveOrUpdateRoute(Route route) throws ToursException;
+    //public Route saveOrUpdateRoute(Route route) throws ToursException;
 
     public Optional<Route> getRouteById(Long id);
 
@@ -42,11 +48,11 @@ public interface ToursRepository {
 
     public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException;
 
-    public Supplier saveOrUpdateSupplier(Supplier supplier) throws ToursException;
+    //public Supplier saveOrUpdateSupplier(Supplier supplier) throws ToursException;
 
     public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException;
 
-    public Service updateServicePriceById(Long id, float newPrice) throws ToursException;
+    //public Service updateServicePriceById(Long id, float newPrice) throws ToursException;
 
     public List<User> getTop5UsersMorePurchases();
     
@@ -58,6 +64,7 @@ public interface ToursRepository {
 
     public List<Route> getRoutsNotSell();
 
+    public Optional<Service> getServiceById (Long id);
 
     //FRANCO
     /** Returns the Supplier of the ID sent if it's exists. */
@@ -70,7 +77,7 @@ public interface ToursRepository {
     public Optional<Service> getServiceByNameAndSupplierId (String name, Long id) throws ToursException;
 
     /** Save the Purchase sent in the BD */
-    public Purchase savePurchase (Purchase purchase) throws ToursException;
+    //public Purchase savePurchase (Purchase purchase) throws ToursException;
     
     /** Creates and add an ItemService in the Purchase given */
     //public ItemService addItemToPurchase (Service service, int quantity, Purchase purchase) throws ToursException;

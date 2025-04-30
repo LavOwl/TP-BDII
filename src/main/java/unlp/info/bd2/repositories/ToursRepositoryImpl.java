@@ -31,8 +31,20 @@ public class ToursRepositoryImpl implements ToursRepository {
     private static final Logger log = LoggerFactory.getLogger(ToursRepositoryImpl.class);
 
     //IVY
+
+    public Object saveNewObject (Object newObject) {
+        Session session = sessionFactory.getCurrentSession();
+        session.persist(newObject);
+        return newObject;
+    }
+
+    public Object updateObject (Object updatedObject) {
+        Session session = sessionFactory.getCurrentSession();
+        session.merge(updatedObject);
+        return updatedObject;
+    }
     
-    public User saveOrUpdateUser(User user) throws ToursException{
+    /*public User saveOrUpdateUser(User user) throws ToursException{
         Session session = sessionFactory.getCurrentSession();
         User sameId = null;
         if(!(user.getId() == null))
@@ -55,7 +67,7 @@ public class ToursRepositoryImpl implements ToursRepository {
         
 
         return user;
-    }
+    }*/
 
     public Optional<User> getUserById(Long id) { //Removed "throws TourException"; it doesn't make sense
         Session session = sessionFactory.getCurrentSession();
@@ -92,7 +104,7 @@ public class ToursRepositoryImpl implements ToursRepository {
     }
 
     
-    public Stop saveOrUpdateStop(Stop stop){
+    /*public Stop saveOrUpdateStop(Stop stop){
         Session session = sessionFactory.getCurrentSession();
 
         if (stop.getId() == null || Objects.isNull(session.find(Stop.class, stop.getId()))) {
@@ -103,7 +115,7 @@ public class ToursRepositoryImpl implements ToursRepository {
         
         
         return stop;
-    }
+    }*/
 
     public List<Stop> getStopByNameStart(String name) {
         Session session = sessionFactory.getCurrentSession();
@@ -116,7 +128,7 @@ public class ToursRepositoryImpl implements ToursRepository {
     
     //FABRI
     
-    public Route saveOrUpdateRoute(Route route) throws ToursException {
+    /*public Route saveOrUpdateRoute(Route route) throws ToursException {
         Session session = sessionFactory.getCurrentSession();
         if (route.getId() == null || Objects.isNull(session.find(Route.class, route.getId()))) {
             session.persist(route);
@@ -125,7 +137,7 @@ public class ToursRepositoryImpl implements ToursRepository {
         }
         
         return route;
-    }
+    }*/
     
     public Optional<Route> getRouteById(Long id){
         Session session = sessionFactory.getCurrentSession();
@@ -195,7 +207,7 @@ public class ToursRepositoryImpl implements ToursRepository {
     }
 
     
-    public Supplier saveOrUpdateSupplier(Supplier supplier) throws ToursException{
+    /*public Supplier saveOrUpdateSupplier(Supplier supplier) throws ToursException{
         Session session = sessionFactory.getCurrentSession();
         if (supplier.getId() == null || Objects.isNull(session.find(Supplier.class, supplier.getId()))) {
             Supplier sameAuthorizationNumberSupplier = session.createQuery("FROM Supplier s WHERE s.authorizationNumber = :authorizationNumber", Supplier.class)
@@ -210,7 +222,7 @@ public class ToursRepositoryImpl implements ToursRepository {
         }
         
         return supplier;
-    }
+    }*/
 
     
     public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException{
@@ -224,7 +236,7 @@ public class ToursRepositoryImpl implements ToursRepository {
                                     //que hacer merge. Se lo deja asi o hay que agregarlo por las dudas?
         return service;
     }
-    public Service updateServicePriceById(Long id, float newPrice) throws ToursException{
+    /*public Service updateServicePriceById(Long id, float newPrice) throws ToursException{
         Session session = sessionFactory.getCurrentSession();
         
         Service service = session.find(Service.class, id);
@@ -241,6 +253,12 @@ public class ToursRepositoryImpl implements ToursRepository {
         
         
         return service;
+    }*/
+
+    public Optional<Service> getServiceById (Long id) {
+        Session session = sessionFactory.getCurrentSession();
+        Service service = session.find(Service.class, id);
+        return Optional.ofNullable(service);
     }
     
     //FRANCO
