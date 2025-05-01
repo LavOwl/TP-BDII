@@ -71,7 +71,7 @@ public class ToursServiceImpl implements ToursService {
     @Override
     @Transactional
     public User updateUser(@NotNull User user) throws ToursException{
-        return toursRepository.save(user);
+        return saveUser(user);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class ToursServiceImpl implements ToursService {
             toursRepository.delete(user);
         }
         catch(IllegalStateException e){
-            if("El usuario se encuentra desactivado".equals(e.getMessage()) || "El usuario no puede ser desactivado".equals(e.getMessage())){
+            if(e.getMessage() != null){
                 throw new ToursException(e.getMessage());
             }
             else{
@@ -93,18 +93,14 @@ public class ToursServiceImpl implements ToursService {
     @Override
     @Transactional
     public Stop createStop(@NotNull String name, @NotNull String description) throws ToursException{
-        if(name.contains("_") || name.contains("%")){
-            throw new ToursException("Cannot use '% or '_' in the name of a stop"); //Couldn't find an HQL function to avoid SQL injection, could manually map characters to /wildcard or similar, but would take too much time and effort.
-        }
+        checkString(name);
         return toursRepository.save(new Stop(name, description));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Stop> getStopByNameStart(@NotNull String name) throws ToursException {
-        if(name.contains("_") || name.contains("%")){
-            throw new ToursException("Cannot use '% or '_' in the name of a stop"); //Couldn't find an HQL function to avoid SQL injection, could manually map characters to /wildcard or similar, but would take too much time and effort.
-        }
+        checkString(name);
         return toursRepository.getStopByNameStart(name);
     }
     
@@ -137,8 +133,9 @@ public class ToursServiceImpl implements ToursService {
         }
         DriverUser driverUser = (DriverUser) optionalDriverUser.get();
         driverUser.addRoute(optionalRoute.get());
-        toursRepository.save(driverUser);
+        //toursRepository.save(driverUser); //Not necessary???????
     }
+
     @Override
     @Transactional
     public void assignTourGuideByUsername(String username, Long idRoute) throws ToursException{
@@ -149,12 +146,12 @@ public class ToursServiceImpl implements ToursService {
         }
         TourGuideUser tourGuideUser = (TourGuideUser) optionalTourGuideUser.get();
         tourGuideUser.addRoute(optionalRoute.get());
-        toursRepository.save(tourGuideUser);
+        //toursRepository.save(tourGuideUser); //Not necessary???????
     }
 
     private void checkString(String s) throws ToursException{
         if(s.contains("_") || s.contains("%"))
-            throw new ToursException("Cannot use '% or '_' in the name of a supplier");
+            throw new ToursException("Cannot use '% or '_' in a name.");
     }
 
     @Override
@@ -186,7 +183,8 @@ public class ToursServiceImpl implements ToursService {
         }
         Service service = optionalService.get();
         service.setPrice(newPrice);
-        return toursRepository.save(service);
+        //save not needed!!!! :DDDDDDD
+        return service;
     }
     
      //FRANCO
