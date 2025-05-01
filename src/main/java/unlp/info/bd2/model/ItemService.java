@@ -26,11 +26,11 @@ public class ItemService {
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
-    @ManyToOne(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER) //Y, alguien lo compró, si no no se entiende ni q es el item.
     @JoinColumn(name = "purchase_id", referencedColumnName = "id", nullable = false)
     private Purchase purchase;
 
-    @ManyToOne(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER) //TENÉS Q SABER Q COMPRARONNNNN
     @JoinColumn(name = "service_id", referencedColumnName = "id", nullable = false)
     private Service service;
 

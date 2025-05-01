@@ -30,7 +30,7 @@ public class Supplier {
     @Column(name = "authorization_number", nullable = false, length = 255, unique = true)
     private String authorizationNumber;
 
-    @OneToMany(mappedBy = "supplier", cascade = {}, orphanRemoval = true, fetch=FetchType.LAZY)
+    @OneToMany(mappedBy = "supplier", cascade = {}, orphanRemoval = true, fetch=FetchType.EAGER) //Depende de como se usen los suppliers.
     private List<Service> services = new ArrayList<>();
 
     public Supplier() {

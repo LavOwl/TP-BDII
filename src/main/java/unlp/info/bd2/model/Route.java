@@ -40,7 +40,7 @@ public class Route {
     @Column(name = "max_number_users", nullable = false)
     private int maxNumberUsers;
 
-    @ManyToMany(cascade = {},fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {},fetch = FetchType.EAGER) //Discutible, depende de la relevancia que tengan las paradas en la aplicación real de la BD.
     @JoinTable(name = "route_stop", joinColumns = @JoinColumn(name = "route_id"), inverseJoinColumns = @JoinColumn(name = "stop_id"))
     private List<Stop> stops = new ArrayList<>();
 

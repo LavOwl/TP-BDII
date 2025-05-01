@@ -38,18 +38,18 @@ public class Purchase {
     @Column(name = "date", nullable = false)
     private Date date;
 
-    @ManyToOne(cascade = {CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.MERGE}, fetch=FetchType.EAGER) //Es relevante para la identidad
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
-    @ManyToOne(cascade = {CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.MERGE}, fetch=FetchType.EAGER) //Es relevante para la identidad
     @JoinColumn(name = "route_id", referencedColumnName = "id", nullable = false)
     private Route route;
 
-    @OneToOne(mappedBy = "purchase", cascade = {CascadeType.REMOVE}, orphanRemoval = true)
+    @OneToOne(mappedBy = "purchase", cascade = {CascadeType.REMOVE}, orphanRemoval = true, fetch=FetchType.LAZY) //No es relevante para toda la identidad.
     private Review review;
 
-    @OneToMany(mappedBy = "purchase", cascade = {CascadeType.REMOVE}, orphanRemoval = true, fetch=FetchType.EAGER)
+    @OneToMany(mappedBy = "purchase", cascade = {CascadeType.REMOVE}, orphanRemoval = true, fetch=FetchType.EAGER) //Los ItemService son parte intrínseca de la compra, determinan su identidad, y le dan signficado a la compra.
     private List<ItemService> itemServiceList = new ArrayList<ItemService>();
 
     public Purchase (String code, Date date, Route route, User user) throws ToursException {
