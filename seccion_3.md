@@ -1,0 +1,158 @@
+Current Mongosh Log ID: 682e12e14f84cc090d6c4bcf
+Connecting to: mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.5.1
+Using MongoDB: 8.0.9
+Using Mongosh: 2.5.1
+
+For mongosh info see: https://www.mongodb.com/docs/mongodb-shell/
+
+To help improve our products, anonymous usage data is collected and sent to MongoDB periodically (https://www.mongodb.com/legal/privacy-policy).
+You can opt-out by running the disableTelemetry() command.
+
+---
+
+The server generated these startup warnings when booting
+2025-05-21T08:34:20.981-03:00: Access control is not enabled for the database. Read and write access to data and configuration is unrestricted
+
+---
+
+12.
+
+test> use tours2
+switched to db tours2
+tours2> load('C:/Users/fabri/OneDrive/Documentos/facu/septimo semestre/BDD2/proyecto/Tp3/generator1.js')
+DeprecationWarning: Collection.insert() is deprecated. Use insertOne, insertMany, or bulkWrite.
+true
+tours2> show collections
+route
+stop
+
+13. I)
+
+tours2> db.route.aggregate([{ $sample: { size:5 } }])
+
+II)db.route.aggregate([{ $sample: { size: 5 } },{ $unwind: "$stops" },{$lookup: {from: "stop",localField: "stops",foreignField: "code",as: "stop_info"}}])
+
+es eso o esto?
+
+tours2> db.route.aggregate([
+... { $sample: { size: 5 } },
+... { $unwind: "$stops" },
+... {
+... $lookup: {
+... from: "stop",
+... localField: "stops",
+... foreignField: "code",
+... as: "stop_info"
+... }
+... },
+... { $unwind: "$stop_info" },
+... {
+... $group: {
+... _id: "$_id",
+... name: { $first: "$name" },
+... price: { $first: "$price" },
+... totalKm: { $first: "$totalKm" },
+... stops: {
+... $addToSet: "$stop_info"
+... }
+... }
+... }
+... ])
+
+III)
+tours2> db.route.aggregate([{ $match: { price:{ $gte:900 }}},{$unwind: "$stops"},{$lookup:{from: "stop",localField: "stops",foreignField: "code",as:"paradas"}}])
+
+o asi?
+db.route.aggregate([
+{
+$match: { price: { $gte: 900 } } // Filtra rutas con precio >= 900
+},
+{
+$unwind: "$stops" // Separa cada stop en documentos individuales
+},
+{
+$lookup: {
+from: "stop", // Colección a unir
+localField: "stops", // Campo en "route" (el código del stop)
+foreignField: "code", // Campo en "stop" (el código del stop)
+as: "stop_info" // Nombre del nuevo campo con la info completa
+}
+},
+{
+$unwind: "$stop_info" // Aplana el array de stop_info
+},
+{
+$group: {
+_id: "$_id", // Agrupar por ID de ruta
+name: { $first: "$name" },
+price: { $first: "$price" },
+totalKm: { $first: "$totalKm" },
+stops: { $addToSet: "$stop_info" } // Reconstruye el array de stops sin duplicados
+}
+}
+])
+
+IV)db.route.aggregate([{$match: {$expr: {$gte: [ { $size: "$stops" }, 5 ]}}}])
+
+V)db.route.aggregate([{$match: {name: { $regex: "111" }}}])
+
+VI)db.route.aggregate([{$match: {name: { $regex: "Route100" }}},{$unwind:"$stops"},{$lookup: {from: "stop",localField: "stops", foreignField: "code",as: "stop_info"}}]) //asi no encuentra a ninguna
+db.route.aggregate([{$match: {name: { $regex: "route100" }}},{$unwind:"$stops"},{$lookup: {from: "stop",localField: "stops", foreignField: "code",as: "stop_info"}}]) //asi si encuentra
+
+o asi?
+db.route.aggregate([
+{
+$match: { name: "route100" } // Filtra la ruta específica (sin usar regex si el nombre es exacto)
+},
+{
+$unwind: "$stops" // Separa cada código de parada en un documento distinto
+},
+{
+$lookup: {
+from: "stop", // Colección con la info de las paradas
+localField: "stops", // Código de parada en la ruta
+foreignField: "code", // Código en la colección 'stop'
+as: "stop_info" // Resultado del join
+}
+},
+{
+$unwind: "$stop_info" // Asegura que stop_info sea un objeto y no un array
+},
+{
+$replaceRoot: { newRoot: "$stop_info" } // Muestra solo los datos de cada parada
+}
+])
+
+VII)
+db.route.aggregate([{$unwind: "$stops"},{$group: {_id: "$stops", count: {$sum: 1}}},{$sort: {count:-1}},{$limit:1},{$lookup:{from:"stop",localField:"_id",foreignField:"code",as: "stopInfo"}}])
+
+VIII)
+db.route.aggregate([{ $match: { price: { $lt: 150 } } },{ $addFields: { cantidadStops: { $size: "$stops" } } },{ $out: "rutas_economicas" }])
+
+IX)
+db.route.aggregate([
+{ $unwind: "$stops" },
+{
+$group: {
+_id: "$stops",
+ promedioPrecio: { $avg: "$price" }
+}
+},
+{
+$lookup: {
+from: "stop",
+localField: "_id",
+foreignField: "code",
+as: "stopInfo"
+}
+},
+{ $unwind: "$stopInfo" },
+{
+$project: {
+_id: 0,
+stopCode: "$_id",
+stopName: "$stopInfo.name",
+promedioPrecio: 1
+}
+}
+]);
