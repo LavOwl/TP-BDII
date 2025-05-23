@@ -130,29 +130,4 @@ VIII)
 db.route.aggregate([{ $match: { price: { $lt: 150 } } },{ $addFields: { cantidadStops: { $size: "$stops" } } },{ $out: "rutas_economicas" }])
 
 IX)
-db.route.aggregate([
-{ $unwind: "$stops" },
-{
-$group: {
-_id: "$stops",
- promedioPrecio: { $avg: "$price" }
-}
-},
-{
-$lookup: {
-from: "stop",
-localField: "_id",
-foreignField: "code",
-as: "stopInfo"
-}
-},
-{ $unwind: "$stopInfo" },
-{
-$project: {
-_id: 0,
-stopCode: "$_id",
-stopName: "$stopInfo.name",
-promedioPrecio: 1
-}
-}
-]);
+db.route.aggregate([{ $unwind: "$stops" },{$group: {_id: "$stops",promedioPrecio: { $avg: "$price" }}},{$lookup: {from: "stop",localField: "_id",foreignField: "code",as: "stopInfo"}}]);
