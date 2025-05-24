@@ -32,7 +32,7 @@ tours2> db.route.aggregate([{ $sample: { size:5 } }])
 
 II)db.route.aggregate([{ $sample: { size: 5 } },{ $unwind: "$stops" },{$lookup: {from: "stop",localField: "stops",foreignField: "code",as: "stop_info"}}])
 
-es eso o esto?
+es eso o esto? #Ivy --> db.route.aggregate([{ $sample: { size: 5 } },{$lookup: {from: "stop",localField: "stops",foreignField: "code",as: "stop_info"}},{$project: {stops: 0}}])]) creo que conviene esto.
 
 tours2> db.route.aggregate([
 ... { $sample: { size: 5 } },
@@ -61,7 +61,7 @@ tours2> db.route.aggregate([
 
 III)
 tours2> db.route.aggregate([{ $match: { price:{ $gte:900 }}},{$unwind: "$stops"},{$lookup:{from: "stop",localField: "stops",foreignField: "code",as:"paradas"}}])
-
+#Ivy --> db.route.aggregate([{ $match: { price: {$gte: 900} } },{$lookup: {from: "stop",localField: "stops",foreignField: "code",as: "stop_info"}},{$project: {stops: 0}}])]) creo q así, unwind no hace falta acá * creo *
 o asi?
 db.route.aggregate([
 {
@@ -105,7 +105,7 @@ db.route.aggregate([
 $match: { name: "route100" } // Filtra la ruta específica (sin usar regex si el nombre es exacto)
 },
 {
-$unwind: "$stops" // Separa cada código de parada en un documento distinto
+$unwind: "$stops" // Separa cada código de parada en un documento distinto #Ivy --> Esta línea no hace falta, pero banco esta tercera resolución, me parece que es la buena.
 },
 {
 $lookup: {
