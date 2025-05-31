@@ -2,47 +2,24 @@ package unlp.info.bd2.model;
 
 
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+import lombok.Data;
+
+@Data
+@Document
 public class Review {
 
+    @Id
     private ObjectId id;
 
     private int rating;
 
     private String comment;
 
+    @Transient //Same problem than with ItemService --> Purchase
     private Purchase purchase;
 
-
-    public ObjectId getId() {
-        return id;
-    }
-
-    public void setId(ObjectId id) {
-        this.id = id;
-    }
-
-    public int getRating() {
-        return rating;
-    }
-
-    public void setRating(int rating) {
-        this.rating = rating;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public Purchase getPurchase() {
-        return purchase;
-    }
-
-    public void setPurchase(Purchase purchase) {
-        this.purchase = purchase;
-    }
 }

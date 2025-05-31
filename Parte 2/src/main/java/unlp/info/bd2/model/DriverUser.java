@@ -3,25 +3,20 @@ package unlp.info.bd2.model;
 
 import java.util.List;
 
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+@Document
 public class DriverUser extends User {
 
     private String expedient;
 
+    @DBRef
     private List<Route> routes;
 
-    public String getExpedient() {
-        return expedient;
-    }
-
-    public void setExpedient(String expedient) {
-        this.expedient = expedient;
-    }
-
-    public List<Route> getRoutes() {
-        return routes;
-    }
-
-    public void setRouts(List<Route> routs) {
-        this.routes = routs;
-    }
 }

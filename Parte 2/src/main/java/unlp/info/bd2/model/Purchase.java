@@ -1,13 +1,21 @@
 package unlp.info.bd2.model;
 
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
 
+@Data
+@Document
 public class Purchase {
 
-    ObjectId id;
+    @Id
+    private ObjectId id;
 
     private String code;
 
@@ -15,77 +23,16 @@ public class Purchase {
 
     private Date date;
 
+    @DBRef
     private User user;
 
+    @DBRef
     private Route route;
 
+    //Embedded by default
     private Review review;
 
+    //Embedded by default
     private List<ItemService> itemServiceList;
 
-
-
-    public ObjectId getId() {
-        return id;
-    }
-
-    public void setId(ObjectId id) {
-        this.id = id;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public float getTotalPrice() {
-        return totalPrice;
-    }
-
-    public void setTotalPrice(float totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Route getRoute() {
-        return route;
-    }
-
-    public void setRoute(Route route) {
-        this.route = route;
-    }
-
-    public Review getReview() {
-        return review;
-    }
-
-    public void setReview(Review review) {
-        this.review = review;
-    }
-
-    public List<ItemService> getItemServiceList() {
-        return itemServiceList;
-    }
-
-    public void setItemServiceList(List<ItemService> itemServiceList) {
-        this.itemServiceList = itemServiceList;
-    }
 }

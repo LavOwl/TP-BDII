@@ -1,12 +1,19 @@
 package unlp.info.bd2.model;
 
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
+import lombok.Data;
+
 import java.util.List;
 
+@Data
+@Document
 public class Service {
 
+    @Id
     private ObjectId id;
 
     private String name;
@@ -15,56 +22,10 @@ public class Service {
 
     private String description;
 
+    @DBRef
     private List<ItemService> itemServiceList;
 
+    @DBRef //Might be better to have the Services embedded, if so, then maybe this should be transient.
     private Supplier supplier;
 
-
-    public ObjectId getId() {
-        return id;
-    }
-
-    public void setId(ObjectId id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public float getPrice() {
-        return price;
-    }
-
-    public void setPrice(float price) {
-        this.price = price;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public List<ItemService> getItemServiceList() {
-        return itemServiceList;
-    }
-
-    public void setItemServiceList(List<ItemService> itemServiceList) {
-        this.itemServiceList = itemServiceList;
-    }
-
-    public Supplier getSupplier() {
-        return supplier;
-    }
-
-    public void setSupplier(Supplier supplier) {
-        this.supplier = supplier;
-    }
 }
