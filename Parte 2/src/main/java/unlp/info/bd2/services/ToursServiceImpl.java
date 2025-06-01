@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.dao.DuplicateKeyException;
 
 import unlp.info.bd2.model.DriverUser;
 import unlp.info.bd2.model.ItemService;
@@ -16,150 +20,224 @@ import unlp.info.bd2.model.Stop;
 import unlp.info.bd2.model.Supplier;
 import unlp.info.bd2.model.TourGuideUser;
 import unlp.info.bd2.model.User;
+import unlp.info.bd2.repositories.UserRepository;
 import unlp.info.bd2.utils.ToursException;
 
 public class ToursServiceImpl implements ToursService {
+
+    @Autowired
+    private UserRepository userRepository;
+    
+    private User saveUser(User user) throws ToursException{
+        try{
+            return userRepository.save(user);
+        }
+        catch(DuplicateKeyException e){
+            throw new ToursException(e.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional
+    public User createUser(String username, String password, String fullName, String email, Date birthdate, String phoneNumber) throws ToursException{
+        return this.saveUser(new User(username, password, fullName, email, birthdate, phoneNumber));
+    }
     
     @Override
-    public User createUser(String username, String password, String fullName, String email, Date birthdate, String phoneNumber) throws ToursException{return null;}
+    @Transactional
+    public DriverUser createDriverUser(String username, String password, String fullName, String email, Date birthdate, String phoneNumber, String expedient) throws ToursException{
+        return (DriverUser)this.saveUser(new DriverUser(username, password, fullName, email, birthdate, phoneNumber, expedient));
+    }
     
     @Override
-    public DriverUser createDriverUser(String username, String password, String fullName, String email, Date birthdate, String phoneNumber, String expedient) throws ToursException{return null;}
+    @Transactional
+    public TourGuideUser createTourGuideUser(String username, String password, String fullName, String email, Date birthdate, String phoneNumber, String education) throws ToursException{
+        return (TourGuideUser)this.saveUser(new TourGuideUser(username, password, fullName, email, birthdate, phoneNumber, education));
+    }
     
     @Override
-    public TourGuideUser createTourGuideUser(String username, String password, String fullName, String email, Date birthdate, String phoneNumber, String education) throws ToursException{return null;}
+    @Transactional(readOnly = true)
+    public Optional<User> getUserById(ObjectId id) throws ToursException{
+        return userRepository.findById(id);
+    }
     
     @Override
-    public Optional<User> getUserById(ObjectId id) throws ToursException{return null;}
+    @Transactional(readOnly = true)
+    public Optional<User> getUserByUsername(String username) throws ToursException{
+        return userRepository.findByUsername(username);
+    }
     
     @Override
-    public Optional<User> getUserByUsername(String username) throws ToursException{return null;}
+    @Transactional
+    public User updateUser(User user) throws ToursException{
+        return this.saveUser(user);
+    }
     
     @Override
-    public User updateUser(User user) throws ToursException{return null;}
+    @Transactional
+    public void deleteUser(User user) throws ToursException{
+        this.userRepository.delete(user); //This gonna be tough
+    }
     
     @Override
-    public void deleteUser(User user) throws ToursException{}
-    
-    @Override
+    @Transactional
     public Stop createStop(String name, String description) throws ToursException{return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public List<Stop> getStopByNameStart(String name){return null;}
     
     @Override
+    @Transactional
     public Route createRoute(String name, float price, float totalKm, int maxNumberOfUsers, List<Stop> stops) throws ToursException{return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public Optional<Route> getRouteById(ObjectId id){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public List<Route> getRoutesBelowPrice(float price){return null;}
     
     @Override
+    @Transactional
     public void assignDriverByUsername(String username, ObjectId idRoute) throws ToursException{}
     
     @Override
+    @Transactional
     public void assignTourGuideByUsername(String username, ObjectId idRoute) throws ToursException{}
     
     @Override
+    @Transactional
     public Supplier createSupplier(String businessName, String authorizationNumber) throws ToursException{return null;}
     
     @Override
+    @Transactional
     public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException{return null;}
     
     @Override
+    @Transactional
     public Service updateServicePriceById(ObjectId id, float newPrice) throws ToursException{return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public Optional<Supplier> getSupplierById(ObjectId id){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public Optional<Supplier> getSupplierByAuthorizationNumber(String authorizationNumber){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public Optional<Service> getServiceByNameAndSupplierId(String name, ObjectId id) throws ToursException{return null;}
     
     @Override
+    @Transactional
     public Purchase createPurchase(String code, Route route, User user) throws ToursException{return null;}
     
     @Override
+    @Transactional
     public Purchase createPurchase(String code, Date date, Route route, User user) throws ToursException{return null;}
     
     @Override
+    @Transactional
     public ItemService addItemToPurchase(Service service, int quantity, Purchase purchase) throws ToursException{return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public Optional<Purchase> getPurchaseByCode(String code){return null;}
     
     @Override
+    @Transactional
     public void deletePurchase(Purchase purchase) throws ToursException{}
     
     @Override
+    @Transactional
     public Review addReviewToPurchase(int rating, String comment, Purchase purchase) throws ToursException{return null;}
 
     // CONSULTAS HQL
     
     @Override
+    @Transactional(readOnly = true)
     public List<Purchase> getAllPurchasesOfUsername(String username){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public List<User> getUserSpendingMoreThan(float mount){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public List<User> getUsersWithNumberOfPurchases(int number){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public List<Supplier> getTopNSuppliersInPurchases(int n){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public List<Supplier> getTopNSuppliersItemsSold(int n){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public List<Purchase> getTop10MoreExpensivePurchasesWithServices(){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public List<User> getTop5UsersMorePurchases(){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public List<Route> getTop3RoutesWithMoreStops(){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public Long getCountOfPurchasesBetweenDates(Date start, Date end){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public List<Route> getRoutesWithStop(Stop stop){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public List<Purchase> getPurchaseWithService(Service service){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public Long getMaxStopOfRoutes(){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public Long getMaxServicesOfSupplier(){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public List<Route> getRoutsNotSell(){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public List<Route> getTop3RoutesWithMaxAverageRating(){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public List<Route> getRoutesWithMinRating(){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public Service getMostDemandedService(){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public Route getMostBestSellingRoute(){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public List<Service> getServiceNoAddedToPurchases(){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public List<TourGuideUser> getTourGuidesWithRating1(){return null;}
     
     @Override
+    @Transactional(readOnly = true)
     public DriverUser getDriverUserWithMoreRoutes(){return null;}
 }

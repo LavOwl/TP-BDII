@@ -6,6 +6,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
@@ -45,7 +46,9 @@ public class ToursQuerysTests {
 
     @BeforeAll
     public void prepareDB() throws Exception {
-        mongoTemplate.getDb().drop();
+        for (String collectionName : mongoTemplate.getCollectionNames()) {
+			mongoTemplate.remove(new Query(), collectionName);
+		}
         this.initializer.prepareDB();
     }
 
