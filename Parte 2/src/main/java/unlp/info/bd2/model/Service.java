@@ -28,4 +28,17 @@ public class Service {
     @DBRef //Might be better to have the Services embedded, if so, then maybe this should be transient.
     private Supplier supplier;
 
+    public Service(String name, float price, String description, Supplier supplier){
+        this.name = name;
+        this.price = price;
+        this.description = description;
+        this.supplier = supplier;
+        this.supplier.addService(this);
+    }
+
+    public Service updatePrice(float price){
+        this.price = price;
+        return this;
+    }
+
 }

@@ -28,4 +28,13 @@ public class ItemService {
 
     @DBRef
     private Service service;
+
+    public ItemService(int quantity, Service service){
+        this.quantity = quantity;
+        this.service = service;
+    }
+
+    public float getCost(){
+        return quantity * service.getPrice();
+    }
 }

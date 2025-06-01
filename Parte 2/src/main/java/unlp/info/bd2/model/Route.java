@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -28,10 +29,18 @@ public class Route {
     private List<Stop> stops;
 
     @DBRef
-    private List<DriverUser> driverList;
+    private List<DriverUser> driverList = new ArrayList<DriverUser>();
 
     @DBRef
-    private List<TourGuideUser> tourGuideList;
+    private List<TourGuideUser> tourGuideList = new ArrayList<TourGuideUser>();
+
+    public Route(String name, float price, float totalKm, int maxNumberUsers, List<Stop> stops) {
+        this.name = name;
+        this.price = price;
+        this.totalKm = totalKm;
+        this.maxNumberUsers = maxNumberUsers;
+        this.stops = stops;
+    }
 
     public void addTourGuide(TourGuideUser tourGuide){
 

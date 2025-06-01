@@ -6,11 +6,13 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
 @Document
+@NoArgsConstructor
 public class Supplier {
 
     @Id
@@ -22,5 +24,14 @@ public class Supplier {
 
     @DBRef //Might be best to embed?
     private List<Service> services;
+
+    public Supplier(String businessName, String authorizationNumber){
+        this.businessName = businessName;
+        this.authorizationNumber = authorizationNumber;
+    }
+
+    public void addService(Service service){
+        this.services.add(service);
+    }
 
 }

@@ -7,9 +7,11 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Document
+@NoArgsConstructor
 public class Review {
 
     @Id
@@ -21,5 +23,10 @@ public class Review {
 
     @Transient //Same problem than with ItemService --> Purchase
     private Purchase purchase;
+
+    public Review(int rating, String comment){
+        this.rating = rating;
+        this.comment = comment;
+    }
 
 }

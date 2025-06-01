@@ -20,6 +20,11 @@ import unlp.info.bd2.model.Stop;
 import unlp.info.bd2.model.Supplier;
 import unlp.info.bd2.model.TourGuideUser;
 import unlp.info.bd2.model.User;
+import unlp.info.bd2.repositories.PurchaseRepository;
+import unlp.info.bd2.repositories.RouteRepository;
+import unlp.info.bd2.repositories.ServiceRepository;
+import unlp.info.bd2.repositories.StopRepository;
+import unlp.info.bd2.repositories.SupplierRepository;
 import unlp.info.bd2.repositories.UserRepository;
 import unlp.info.bd2.utils.ToursException;
 
@@ -28,6 +33,21 @@ public class ToursServiceImpl implements ToursService {
     @Autowired
     private UserRepository userRepository;
     
+    @Autowired
+    private StopRepository stopRepository;
+
+    @Autowired
+    private RouteRepository routeRepository;
+
+    @Autowired
+    private PurchaseRepository purchaseRepository;
+
+    @Autowired
+    private SupplierRepository supplierRepository;
+
+    @Autowired
+    private ServiceRepository serviceRepository;
+
     private User saveUser(User user) throws ToursException{
         try{
             return userRepository.save(user);
@@ -81,19 +101,27 @@ public class ToursServiceImpl implements ToursService {
     
     @Override
     @Transactional
-    public Stop createStop(String name, String description) throws ToursException{return null;}
+    public Stop createStop(String name, String description) throws ToursException{
+        return stopRepository.save(new Stop(name, description));
+    }
     
     @Override
     @Transactional(readOnly = true)
-    public List<Stop> getStopByNameStart(String name){return null;}
+    public List<Stop> getStopByNameStart(String name){
+        return stopRepository.findByNameStartingWith(name);
+    }
     
     @Override
     @Transactional
-    public Route createRoute(String name, float price, float totalKm, int maxNumberOfUsers, List<Stop> stops) throws ToursException{return null;}
+    public Route createRoute(String name, float price, float totalKm, int maxNumberOfUsers, List<Stop> stops) throws ToursException{
+        return routeRepository.save(new Route(name, price, totalKm, maxNumberOfUsers, stops));
+    }
     
     @Override
     @Transactional(readOnly = true)
-    public Optional<Route> getRouteById(ObjectId id){return null;}
+    public Optional<Route> getRouteById(ObjectId id){
+        return routeRepository.findById(id);
+    }
     
     @Override
     @Transactional(readOnly = true)
@@ -105,27 +133,43 @@ public class ToursServiceImpl implements ToursService {
     
     @Override
     @Transactional
-    public void assignTourGuideByUsername(String username, ObjectId idRoute) throws ToursException{}
+    public void assignTourGuideByUsername(String username, ObjectId idRoute) throws ToursException{
+        Route route = routeRepository.findById(idRoute).orElseThrow(() -> new ToursException("Id inválido para una ruta"));
+        //Falta completar
+        
+    }
     
     @Override
     @Transactional
-    public Supplier createSupplier(String businessName, String authorizationNumber) throws ToursException{return null;}
+    public Supplier createSupplier(String businessName, String authorizationNumber) throws ToursException{
+        return supplierRepository.save(new Supplier(businessName, authorizationNumber));
+    }
     
     @Override
     @Transactional
-    public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException{return null;}
+    public Service addServiceToSupplier(String name, float price, String description, Supplier supplier) throws ToursException{
+        Service service = serviceRepository.save(new Service(name, price, description, supplier));
+        supplierRepository.save(supplier);
+        return service;
+    }
     
     @Override
     @Transactional
-    public Service updateServicePriceById(ObjectId id, float newPrice) throws ToursException{return null;}
+    public Service updateServicePriceById(ObjectId id, float newPrice) throws ToursException{
+        return serviceRepository.save(serviceRepository.findById(id).orElseThrow(() -> new ToursException("Id inexistente para un servicio")).updatePrice(newPrice));
+    }
     
     @Override
     @Transactional(readOnly = true)
-    public Optional<Supplier> getSupplierById(ObjectId id){return null;}
+    public Optional<Supplier> getSupplierById(ObjectId id){
+        return supplierRepository.findById(id);
+    }
     
     @Override
     @Transactional(readOnly = true)
-    public Optional<Supplier> getSupplierByAuthorizationNumber(String authorizationNumber){return null;}
+    public Optional<Supplier> getSupplierByAuthorizationNumber(String authorizationNumber){
+        return supplierRepository.findByAuthorizationNumber(authorizationNumber);
+    }
     
     @Override
     @Transactional(readOnly = true)
@@ -133,27 +177,40 @@ public class ToursServiceImpl implements ToursService {
     
     @Override
     @Transactional
-    public Purchase createPurchase(String code, Route route, User user) throws ToursException{return null;}
+    public Purchase createPurchase(String code, Route route, User user) throws ToursException{
+        return purchaseRepository.save(new Purchase(code, route, user));
+    }
     
     @Override
     @Transactional
-    public Purchase createPurchase(String code, Date date, Route route, User user) throws ToursException{return null;}
+    public Purchase createPurchase(String code, Date date, Route route, User user) throws ToursException{
+        return purchaseRepository.save(new Purchase(code, date, route, user));
+    }
     
     @Override
     @Transactional
-    public ItemService addItemToPurchase(Service service, int quantity, Purchase purchase) throws ToursException{return null;}
+    public ItemService addItemToPurchase(Service service, int quantity, Purchase purchase) throws ToursException{
+        Purchase p = purchaseRepository.save(purchase.addItemService(new ItemService(quantity, service)));
+        return p.getItemServiceList().get(p.getItemServiceList().size());
+    }
     
     @Override
     @Transactional(readOnly = true)
-    public Optional<Purchase> getPurchaseByCode(String code){return null;}
+    public Optional<Purchase> getPurchaseByCode(String code){
+        return purchaseRepository.findByCode(code);
+    }
     
     @Override
     @Transactional
-    public void deletePurchase(Purchase purchase) throws ToursException{}
+    public void deletePurchase(Purchase purchase) throws ToursException{
+        purchaseRepository.delete(purchase);
+    }
     
     @Override
     @Transactional
-    public Review addReviewToPurchase(int rating, String comment, Purchase purchase) throws ToursException{return null;}
+    public Review addReviewToPurchase(int rating, String comment, Purchase purchase) throws ToursException{
+        return purchaseRepository.save(purchase.addReview(new Review(rating, comment))).getReview();
+    }
 
     // CONSULTAS HQL
     
