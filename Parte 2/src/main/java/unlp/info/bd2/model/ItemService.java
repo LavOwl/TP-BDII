@@ -6,14 +6,20 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.FieldType;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Document
+@NoArgsConstructor
 public class ItemService {
 
+    @MongoId(FieldType.OBJECT_ID)
     @Id
+    
     private ObjectId id;
 
     private int quantity;
@@ -29,12 +35,15 @@ public class ItemService {
     @DBRef
     private Service service;
 
-    public ItemService(int quantity, Service service){
+    public ItemService(int quantity, Service service, Purchase purchase){
+        this.id = new ObjectId();
         this.quantity = quantity;
         this.service = service;
+        this.purchase = purchase;
+        this.service.addItemService(this);
     }
 
     public float getCost(){
-        return quantity * service.getPrice();
+        return this.quantity * service.getPrice();
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -23,7 +24,7 @@ public class Service {
     private String description;
 
     @DBRef
-    private List<ItemService> itemServiceList;
+    private List<ItemService> itemServiceList = new ArrayList<ItemService>();
 
     @DBRef //Might be better to have the Services embedded, if so, then maybe this should be transient.
     private Supplier supplier;
@@ -39,6 +40,10 @@ public class Service {
     public Service updatePrice(float price){
         this.price = price;
         return this;
+    }
+
+    public void addItemService(ItemService itemService){
+        this.itemServiceList.add(itemService);
     }
 
 }

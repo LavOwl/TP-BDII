@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import unlp.info.bd2.utils.ToursException;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,4 +53,17 @@ public class User {
         this.active = true;
     }
 
+    public void addPurchase(Purchase purchase){
+        this.purchaseList.add(purchase);
+    }
+
+    public void logicalRemoval() throws ToursException{
+        if(!active){
+            throw new ToursException("Usuario ya desactivado");
+        }
+        if(purchaseList.size() != 0){
+            this.active = false;
+            throw new RuntimeException("Constraints Error");
+        }
+    }
 }

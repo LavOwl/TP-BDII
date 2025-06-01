@@ -96,7 +96,17 @@ public class ToursServiceImpl implements ToursService {
     @Override
     @Transactional
     public void deleteUser(User user) throws ToursException{
-        this.userRepository.delete(user); //This gonna be tough
+        user = userRepository.findById(user.getId()).orElseThrow(() -> new ToursException("Usuario no existente"));
+        try{
+            user.logicalRemoval();
+            this.userRepository.delete(user);
+        }
+        catch(RuntimeException e){
+            this.userRepository.save(user);
+        }
+        catch(ToursException e){
+            throw e;
+        }
     }
     
     @Override
@@ -125,24 +135,39 @@ public class ToursServiceImpl implements ToursService {
     
     @Override
     @Transactional(readOnly = true)
-    public List<Route> getRoutesBelowPrice(float price){return null;}
+    public List<Route> getRoutesBelowPrice(float price){
+        return routeRepository.findAllByPriceIsLessThan(price);
+    }
     
     @Override
     @Transactional
-    public void assignDriverByUsername(String username, ObjectId idRoute) throws ToursException{}
+    public void assignDriverByUsername(String username, ObjectId idRoute) throws ToursException{
+        Route route = routeRepository.findById(idRoute).orElseThrow(() -> new ToursException("Id inválido para una ruta"));
+        DriverUser driver = userRepository.findDriverUserByUsername(username).orElseThrow(() -> new ToursException("Id inválido para un usuario"));
+        route.addDriver(driver);
+        routeRepository.save(route);
+        userRepository.save(driver);
+    }
     
     @Override
     @Transactional
     public void assignTourGuideByUsername(String username, ObjectId idRoute) throws ToursException{
         Route route = routeRepository.findById(idRoute).orElseThrow(() -> new ToursException("Id inválido para una ruta"));
-        //Falta completar
-        
+        TourGuideUser tourGuide = userRepository.findTourGuideUserByUsername(username).orElseThrow(() -> new ToursException("Id inválido para un usuario"));
+        route.addTourGuide(tourGuide);
+        routeRepository.save(route);
+        userRepository.save(tourGuide);
     }
     
     @Override
     @Transactional
     public Supplier createSupplier(String businessName, String authorizationNumber) throws ToursException{
-        return supplierRepository.save(new Supplier(businessName, authorizationNumber));
+        try{
+            return supplierRepository.save(new Supplier(businessName, authorizationNumber));
+        }
+        catch(DuplicateKeyException e){
+            throw new ToursException("Código de autorización duplicado");
+        }
     }
     
     @Override
@@ -173,25 +198,39 @@ public class ToursServiceImpl implements ToursService {
     
     @Override
     @Transactional(readOnly = true)
-    public Optional<Service> getServiceByNameAndSupplierId(String name, ObjectId id) throws ToursException{return null;}
+    public Optional<Service> getServiceByNameAndSupplierId(String name, ObjectId id) throws ToursException{
+        return serviceRepository.findByNameAndSupplierId(name, id);
+    }
     
+    private Purchase savePurchase(Purchase purchase) throws ToursException{
+        try{
+            purchase = purchaseRepository.save(purchase);
+            userRepository.save(purchase.getUser());
+            return purchase;
+        }
+        catch(DuplicateKeyException e){
+            throw new ToursException("Constraint Error");
+        }
+    }
+
     @Override
     @Transactional
     public Purchase createPurchase(String code, Route route, User user) throws ToursException{
-        return purchaseRepository.save(new Purchase(code, route, user));
+        return this.savePurchase(new Purchase(code, route, user));
     }
     
     @Override
     @Transactional
     public Purchase createPurchase(String code, Date date, Route route, User user) throws ToursException{
-        return purchaseRepository.save(new Purchase(code, date, route, user));
+        return this.savePurchase(new Purchase(code, date, route, user));
     }
     
     @Override
     @Transactional
     public ItemService addItemToPurchase(Service service, int quantity, Purchase purchase) throws ToursException{
-        Purchase p = purchaseRepository.save(purchase.addItemService(new ItemService(quantity, service)));
-        return p.getItemServiceList().get(p.getItemServiceList().size());
+        Purchase p = purchaseRepository.save(purchase.addItemService(new ItemService(quantity, service, purchase)));
+        serviceRepository.save(service);
+        return p.getItemServiceList().get(p.getItemServiceList().size()-1);
     }
     
     @Override
@@ -209,7 +248,8 @@ public class ToursServiceImpl implements ToursService {
     @Override
     @Transactional
     public Review addReviewToPurchase(int rating, String comment, Purchase purchase) throws ToursException{
-        return purchaseRepository.save(purchase.addReview(new Review(rating, comment))).getReview();
+        purchase.setReview(new Review(rating, comment));
+        return purchaseRepository.save(purchase).getReview();
     }
 
     // CONSULTAS HQL

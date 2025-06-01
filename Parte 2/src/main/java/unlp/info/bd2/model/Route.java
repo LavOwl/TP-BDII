@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Data;
+import unlp.info.bd2.utils.ToursException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,9 @@ public class Route {
     @DBRef
     private List<TourGuideUser> tourGuideList = new ArrayList<TourGuideUser>();
 
+    @DBRef
+    private List<Purchase> purchases = new ArrayList<Purchase>();
+
     public Route(String name, float price, float totalKm, int maxNumberUsers, List<Stop> stops) {
         this.name = name;
         this.price = price;
@@ -43,11 +47,22 @@ public class Route {
     }
 
     public void addTourGuide(TourGuideUser tourGuide){
-
+        this.tourGuideList.add(tourGuide);
+        tourGuide.addRoute(this);
     }
 
     public void addDriver(DriverUser driverUser){
+        this.driverList.add(driverUser);
+        driverUser.addRoute(this);
+    }
 
+    public void addPurchase(Purchase purchase) throws ToursException{
+        if(purchases.size() < this.maxNumberUsers){
+            this.purchases.add(purchase);
+        }
+        else{
+            throw new ToursException("No se pudo hacer la compra");
+        }
     }
 
 }

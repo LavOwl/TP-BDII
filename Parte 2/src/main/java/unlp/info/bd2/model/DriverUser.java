@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import unlp.info.bd2.utils.ToursException;
 
 @Data
 @Document(collection = "users")
@@ -26,4 +27,15 @@ public class DriverUser extends User {
         this.expedient = expedient;
     }
 
+    public void addRoute(Route route){
+        this.routes.add(route);
+    }
+
+    @Override
+    public void logicalRemoval() throws ToursException{
+        if(routes.size() != 0){
+            throw new ToursException("Constraints Error");
+        }
+        super.logicalRemoval();
+    }
 }
