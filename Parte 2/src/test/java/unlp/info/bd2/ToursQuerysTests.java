@@ -7,11 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
-import org.springframework.transaction.annotation.Transactional;
-import unlp.info.bd2.config.AppConfig;
 import unlp.info.bd2.model.*;
 import unlp.info.bd2.services.ToursService;
 import unlp.info.bd2.utils.DBInitializer;
@@ -46,9 +41,7 @@ public class ToursQuerysTests {
 
     @BeforeAll
     public void prepareDB() throws Exception {
-        for (String collectionName : mongoTemplate.getCollectionNames()) {
-			mongoTemplate.remove(new Query(), collectionName);
-		}
+        mongoTemplate.getCollectionNames().stream().forEach(c -> mongoTemplate.remove(new Query(),c));
         this.initializer.prepareDB();
     }
 
@@ -115,14 +108,6 @@ public class ToursQuerysTests {
     }
 
     @Test
-        // DELETE
-    void getTop10MoreExpensivePurchasesInServicesTest() throws ToursException {
-        List<Purchase> purchases = this.service.getTop10MoreExpensivePurchasesWithServices();
-        assertEquals(10, purchases.size());
-        this.assertListEquality(purchases.stream().map(Purchase::getCode).collect(Collectors.toList()), Arrays.asList("P004", "P007", "P008", "P010", "P012", "P013", "P014", "P017", "P018", "P020"));
-    }
-
-    @Test
     void getTop5UsersMorePurchasesTest() throws ToursException {
         List<User> usersMorePurchases = this.service.getTop5UsersMorePurchases();
         assertEquals(5, usersMorePurchases.size());
@@ -164,16 +149,6 @@ public class ToursQuerysTests {
     }
 
     @Test
-    void getPurchaseWithServiceTest() throws ToursException {
-        // DELETE
-        Supplier supplier1 = this.service.getSupplierByAuthorizationNumber("54321").get();
-        Service service1 = this.service.getServiceByNameAndSupplierId("Delta Coffe", supplier1.getId()).get();
-        List<Purchase> purchases1 = this.service.getPurchaseWithService(service1);
-        assertEquals(3, purchases1.size());
-        this.assertListEquality(purchases1.stream().map(Purchase::getCode).collect(Collectors.toList()), List.of("P001", "P013", "P019"));
-    }
-
-    @Test
     void getMaxStopOfRoutesTest() throws ToursException {
         Long maxStopOfRoutes = this.service.getMaxStopOfRoutes();
         assertEquals(9, maxStopOfRoutes);
@@ -183,14 +158,6 @@ public class ToursQuerysTests {
     void getMaxServicesOfSupplierTest() throws ToursException {
         Long maxServicesOfSupplier = this.service.getMaxServicesOfSupplier();
         assertEquals(4, maxServicesOfSupplier);
-    }
-
-    @Test
-    void getRoutsNotSellTest() throws ToursException {
-        // DELETE
-        List<Route> routsNotSell = this.service.getRoutsNotSell();
-        assertEquals(1, routsNotSell.size());
-        this.assertListEquality(routsNotSell.stream().map(Route::getName).collect(Collectors.toList()), List.of("Ruta vacia"));
     }
 
     @Test

@@ -1,5 +1,6 @@
 package unlp.info.bd2.services;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -206,6 +207,7 @@ public class ToursServiceImpl implements ToursService {
         try{
             purchase = purchaseRepository.save(purchase);
             userRepository.save(purchase.getUser());
+            //routeRepository.save(purchase.getRoute());
             return purchase;
         }
         catch(DuplicateKeyException e){
@@ -216,7 +218,7 @@ public class ToursServiceImpl implements ToursService {
     @Override
     @Transactional
     public Purchase createPurchase(String code, Route route, User user) throws ToursException{
-        return this.savePurchase(new Purchase(code, route, user));
+        return this.savePurchase(new Purchase(code, new Date(), route, user));
     }
     
     @Override
@@ -228,9 +230,10 @@ public class ToursServiceImpl implements ToursService {
     @Override
     @Transactional
     public ItemService addItemToPurchase(Service service, int quantity, Purchase purchase) throws ToursException{
-        Purchase p = purchaseRepository.save(purchase.addItemService(new ItemService(quantity, service, purchase)));
+        ItemService itemService = new ItemService(quantity, service, purchase);
+        purchaseRepository.save(purchase);
         serviceRepository.save(service);
-        return p.getItemServiceList().get(p.getItemServiceList().size()-1);
+        return itemService;
     }
     
     @Override
@@ -248,7 +251,7 @@ public class ToursServiceImpl implements ToursService {
     @Override
     @Transactional
     public Review addReviewToPurchase(int rating, String comment, Purchase purchase) throws ToursException{
-        purchase.setReview(new Review(rating, comment));
+        purchase.setReview(new Review(rating, comment, purchase));
         return purchaseRepository.save(purchase).getReview();
     }
 
@@ -256,32 +259,46 @@ public class ToursServiceImpl implements ToursService {
     
     @Override
     @Transactional(readOnly = true)
-    public List<Purchase> getAllPurchasesOfUsername(String username){return null;}
+    public List<Purchase> getAllPurchasesOfUsername(String username){
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if(optionalUser.isPresent()){
+            return optionalUser.get().getPurchaseList();
+        }
+        return new ArrayList<Purchase>();
+    }
     
     @Override
     @Transactional(readOnly = true)
-    public List<User> getUserSpendingMoreThan(float mount){return null;}
+    public List<User> getUserSpendingMoreThan(float mount){
+        return purchaseRepository.getUsersOfPurchasesOver(mount);
+    }
     
     @Override
     @Transactional(readOnly = true)
-    public List<User> getUsersWithNumberOfPurchases(int number){return null;}
+    public List<User> getUsersWithNumberOfPurchases(int number){
+        return userRepository.getUsersWithNPurchases(number);
+    }
     
     @Override
     @Transactional(readOnly = true)
-    public List<Supplier> getTopNSuppliersInPurchases(int n){return null;}
+    public List<Supplier> getTopNSuppliersInPurchases(int n){
+        return purchaseRepository.getTopNMostPresentSuppliers(n);
+    }
     
     @Override
     @Transactional(readOnly = true)
-    public List<Supplier> getTopNSuppliersItemsSold(int n){return null;}
-    
+    public List<Supplier> getTopNSuppliersItemsSold(int n){
+        return serviceRepository.getTopNSuppliersInItemsSold(n);
+    }
+
     @Override
     @Transactional(readOnly = true)
-    public List<Purchase> getTop10MoreExpensivePurchasesWithServices(){return null;}
+    public List<User> getTop5UsersMorePurchases(){
+        return userRepository.getTopNUsersMorePurchases(5);
+    }
     
-    @Override
-    @Transactional(readOnly = true)
-    public List<User> getTop5UsersMorePurchases(){return null;}
-    
+    //Fabri
+
     @Override
     @Transactional(readOnly = true)
     public List<Route> getTop3RoutesWithMoreStops(){return null;}
@@ -296,20 +313,14 @@ public class ToursServiceImpl implements ToursService {
     
     @Override
     @Transactional(readOnly = true)
-    public List<Purchase> getPurchaseWithService(Service service){return null;}
-    
-    @Override
-    @Transactional(readOnly = true)
     public Long getMaxStopOfRoutes(){return null;}
     
     @Override
     @Transactional(readOnly = true)
     public Long getMaxServicesOfSupplier(){return null;}
     
-    @Override
-    @Transactional(readOnly = true)
-    public List<Route> getRoutsNotSell(){return null;}
-    
+    //Franco
+
     @Override
     @Transactional(readOnly = true)
     public List<Route> getTop3RoutesWithMaxAverageRating(){return null;}

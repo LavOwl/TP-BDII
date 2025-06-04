@@ -24,9 +24,12 @@ public class Review {
     @Transient //Same problem than with ItemService --> Purchase
     private Purchase purchase;
 
-    public Review(int rating, String comment){
+    public Review(int rating, String comment, Purchase purchase){
+        //this.id = new ObjectId(); //No quieren que tenga id :(
         this.rating = rating;
         this.comment = comment;
+        this.purchase = purchase;
+        this.purchase.setReview(this);
     }
 
 }

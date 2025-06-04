@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-@Document
+@Document(collection = "purchase")
 @NoArgsConstructor
 public class Purchase {
 
@@ -41,22 +41,15 @@ public class Purchase {
     //Embedded by default
     private List<ItemService> itemServiceList = new ArrayList<ItemService>();
 
-    public Purchase(String code, Route route, User user){
-        this.code = code;
-        this.route = route;
-        this.user = user;
-        this.totalPrice = route.getPrice();
-        user.addPurchase(this);
-    }
-
     public Purchase(String code, Date date, Route route, User user) throws ToursException{
         route.addPurchase(this);
+        this.route = route;
 
         this.code = code;
         this.date = date;
-        this.route = route;
-        this.user = user;
         this.totalPrice = route.getPrice();
+
+        this.user = user;
         user.addPurchase(this);
     }
 

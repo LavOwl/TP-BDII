@@ -8,19 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
-import org.springframework.transaction.annotation.Transactional;
-import unlp.info.bd2.config.AppConfig;
 import unlp.info.bd2.model.*;
 import unlp.info.bd2.services.ToursService;
-import unlp.info.bd2.utils.DBInitializer;
 import unlp.info.bd2.utils.ToursException;
 
-import javax.swing.text.html.Option;
-import java.time.LocalDate;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,9 +35,7 @@ class ToursApplicationTests {
 
 	@BeforeEach
 	public void setUp(){
-		for (String collectionName : mongoTemplate.getCollectionNames()) {
-			mongoTemplate.remove(new Query(), collectionName);
-		}
+		mongoTemplate.getCollectionNames().stream().forEach(c -> mongoTemplate.remove(new Query(),c));
 		Calendar cal1 = Calendar.getInstance();
 		cal1.set(1980, Calendar.APRIL, 5);
 		this.dob1 = cal1.getTime();
