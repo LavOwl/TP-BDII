@@ -26,6 +26,8 @@ public interface RouteRepository extends MongoRepository<Route, ObjectId> {
         "{ $project: { routeId: '$route' } }",
         // Junto los ID para evitar repetidos
         "{ $group: { _id: '$routeId' } }",
+        // Cambio el nombre _id a RouteId
+        "{ $project: { routeId: '$_id' } }", 
         // Busco las rutas con (logicamente según entiendo) con rating 1
         "{ $lookup: { from: 'route', localField: 'routeId', foreignField: 'id' , as: 'routes' } }",
         // Desarmo las rutas, quedandome una combinacion routeId-route
@@ -48,6 +50,8 @@ public interface RouteRepository extends MongoRepository<Route, ObjectId> {
         "{ $project: { routeId: '$route', rating: '$review.rating' } }",
         // Agrupo las rutas calculando su rating promedio
         "{ $group: { _id: '$routeId', avgRating: { $avg: '$rating' } } }",
+        // Cambio el nombre _id a RouteId
+        "{ $project: { routeId: '$_id', avgRating: 1 } }", 
         // Ordeno de Mayor a Menor el Rating
         "{ $sort: { avgRating: -1 } }",
         // Me quedo con los tres mayores
@@ -72,6 +76,8 @@ public interface RouteRepository extends MongoRepository<Route, ObjectId> {
         "{ $project: { routeId: '$_id', purchaseId: 'purchases.$_id' } }",
         // Agrupo por la ruta y cuento sus compras
         "{ $group: { _id: '$routeId', cantPurchases: { $sum: 1 } } }",
+        // Cambio el nombre _id a RouteId
+        "{ $project: { routeId: '$_id', cantPurchases: 1 } }", 
         // Ordeno de mator a menor segun la cantidad de compras
         "{ $sort: { cantPurchases: -1 } }",
         // Me quedo con la ruta con mayor cantidad de compras

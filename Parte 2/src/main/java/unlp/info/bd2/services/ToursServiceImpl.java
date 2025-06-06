@@ -336,7 +336,7 @@ public class ToursServiceImpl implements ToursService {
     @Override
     @Transactional(readOnly = true)
     public Service getMostDemandedService () {
-        return null;
+        return this.serviceRepository.getMostDemandedService();
     }
     
     @Override
