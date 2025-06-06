@@ -347,13 +347,19 @@ public class ToursServiceImpl implements ToursService {
     
     @Override
     @Transactional(readOnly = true)
-    public List<Service> getServiceNoAddedToPurchases(){return null;}
+    public List<Service> getServiceNoAddedToPurchases () {
+        return null; // this.serviceRepository.getServiceNoAddedToPurchases(); // Nose como carajos haria un not exist acá
+    }
     
     @Override
     @Transactional(readOnly = true)
-    public List<TourGuideUser> getTourGuidesWithRating1(){return null;}
+    public List<TourGuideUser> getTourGuidesWithRating1 () {
+        return userRepository.getTourGuidesWithRating1();
+    }
     
     @Override
     @Transactional(readOnly = true)
-    public DriverUser getDriverUserWithMoreRoutes(){return null;}
+    public DriverUser getDriverUserWithMoreRoutes () {
+        return userRepository.getDriverUserWithMoreRoutes();
+    }
 }
