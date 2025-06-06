@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import unlp.info.bd2.model.Route;
 import unlp.info.bd2.model.Purchase;
 import unlp.info.bd2.model.Supplier;
 import unlp.info.bd2.model.User;

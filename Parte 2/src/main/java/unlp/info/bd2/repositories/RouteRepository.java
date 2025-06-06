@@ -31,7 +31,7 @@ public interface RouteRepository extends MongoRepository<Route, ObjectId> {
         // Desarmo las rutas, quedandome una combinacion routeId-route
         "{ $unwind: '$routes._id' }",
         // Reemplazo los documentos de forma que me quede solo route
-        "{ $replaceRoot: { newRoot: '$routes' } }"
+        "{ $replaceRoot: { newRoot: '$routes._id' } }"
     })
     public List<Route> getRoutesWithMinRating ();
     //No funciona y no se porque
@@ -65,22 +65,25 @@ public interface RouteRepository extends MongoRepository<Route, ObjectId> {
     //No funciona y no se porque
 
 
-    @Aggregation(pipeline = {
-        // Desarmo las compras
+   @Aggregation(pipeline = {
+        // Desarmo las compras de la ruta
         "{ $unwind: '$purchases' }",
-        // Projecto solo la ruta y las compras
-        "{ $project: { routeId: '$_id', purchase: '$purchases._id' } }",
-        // Agrupo las rutas y cuento sus compras
-        "{ $group: { _id: '$routeId', cantPurchases: { $count: '$purchases._id' } } }",
-        // Ordeno de Mayor a Menor las rutas por cantidad de compras
+        // Proyecto la ruta y la compra
+        "{ $project: { routeId: '$_id', purchaseId: 'purchases.$_id' } }",
+        // Agrupo por la ruta y cuento sus compras
+        "{ $group: { _id: '$routeId', cantPurchases: { $sum: 1 } } }",
+        // Ordeno de mator a menor segun la cantidad de compras
         "{ $sort: { cantPurchases: -1 } }",
-        // Me quedo con la de mayor cantidad de compras
+        // Me quedo con la ruta con mayor cantidad de compras
         "{ $limit: 1 }",
-        // Recupero la ruta
-        "{ $lookup: { from: 'route', localField: '_id', foreignField: '_id', as: 'route' }",
-        // Reemplazo el documento por la ruta
-        "{ $replaceRoot: { newRoot: 'route._id' } }"
+        // Me traigo la ruta
+        "{ $lookup: { from: 'route', localField: '_id', foreignField: '_id', as: 'route' } }",
+        // Desarmo la ruta
+        "{ $unwind: '$route' }",
+        // Reemplazar root por el documento original de la ruta
+        "{ $replaceRoot: { newRoot: '$route._id' } }"
     })
-    public Route getMostBestSellingRoute ();
-    //No funciona y no se porque
+    public Route getMostBestSellingRoute();
+    //No funciona y nose porque
+
 }
