@@ -324,13 +324,13 @@ public class ToursServiceImpl implements ToursService {
     @Override
     @Transactional(readOnly = true)
     public List<Route> getTop3RoutesWithMaxAverageRating () {
-        return this.purchaseRepository.getTop3RoutesWithMaxAverageRating();
+        return this.routeRepository.getTop3RoutesWithMaxAverageRating();
     }
     
     @Override
     @Transactional(readOnly = true)
     public List<Route> getRoutesWithMinRating () {
-        return this.purchaseRepository.getRoutesWithMinRating();
+        return this.routeRepository.getRoutesWithMinRating();
     }
     
     @Override
@@ -342,7 +342,7 @@ public class ToursServiceImpl implements ToursService {
     @Override
     @Transactional(readOnly = true)
     public Route getMostBestSellingRoute () {
-        return this.purchaseRepository.getMostBestSellingRoute();
+        return this.routeRepository.getMostBestSellingRoute();
     }
     
     @Override
