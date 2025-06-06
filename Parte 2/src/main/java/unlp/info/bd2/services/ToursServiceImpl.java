@@ -335,11 +335,15 @@ public class ToursServiceImpl implements ToursService {
     
     @Override
     @Transactional(readOnly = true)
-    public Service getMostDemandedService(){return null;}
+    public Service getMostDemandedService () {
+        return null;
+    }
     
     @Override
     @Transactional(readOnly = true)
-    public Route getMostBestSellingRoute(){return null;}
+    public Route getMostBestSellingRoute () {
+        return this.purchaseRepository.getMostBestSellingRoute();
+    }
     
     @Override
     @Transactional(readOnly = true)

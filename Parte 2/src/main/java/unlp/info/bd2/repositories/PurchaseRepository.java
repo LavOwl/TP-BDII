@@ -71,4 +71,15 @@ public interface PurchaseRepository extends MongoRepository<Purchase, ObjectId> 
     /*No funciona, nose porque, en el test debe devolver 2 y no devuelve ninguno.
     Además, lo puse aca porque al estar la review embebida, si la hago desde RouteRepository es un quilombo.
     */
+
+   @Aggregation(pipeline = {
+        "{ $project: { routeId: '$route.$id' } }",
+        "{ $group: { _id: '$routeId', count: { $sum: 1 } } }",
+        "{ $sort: { count: -1 } }",
+        "{ $limit: 1 }",
+        "{ $lookup: { from: 'route', localField: '_id', foreignField: '_id', as: 'route' } }",
+        "{ $unwind: '$route' }",
+        "{ $replaceRoot: { newRoot: '$route' } }"
+    })
+    public Route getMostBestSellingRoute();
 }
