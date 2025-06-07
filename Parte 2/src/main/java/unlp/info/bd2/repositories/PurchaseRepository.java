@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import unlp.info.bd2.model.Purchase;
 import unlp.info.bd2.model.Supplier;
 import unlp.info.bd2.model.User;
+import unlp.info.bd2.model.Route;
 
 @Repository
 public interface PurchaseRepository extends MongoRepository<Purchase, ObjectId> {
@@ -40,4 +41,17 @@ public interface PurchaseRepository extends MongoRepository<Purchase, ObjectId> 
         "{$replaceRoot: {newRoot: '$_id'}}"
     })
     public List<Supplier> getTopNMostPresentSuppliers(int n);
+
+
+    @Aggregation(pipeline = {
+        "{ $match: { 'review.rating': { $exists: true } } }",
+        "{ $project: { routeId: '$route.$id', rating: '$review.rating' } }",
+        "{ $group: { _id: '$routeId', averageRating: { $avg: '$rating' } } }",
+        "{ $sort: { averageRating: -1 } }",
+        "{ $limit: 3 }",
+        "{ $lookup: { from: 'route', localField: '_id', foreignField: '_id', as: 'routeDetails' } }",
+        "{ $unwind: '$routeDetails' }",
+        "{ $replaceRoot: { newRoot: '$routeDetails' } }"
+    })
+    public List<Route> getTop3RoutesWithMaxAverageRating();
 }

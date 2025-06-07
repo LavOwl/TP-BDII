@@ -324,7 +324,7 @@ public class ToursServiceImpl implements ToursService {
     @Override
     @Transactional(readOnly = true)
     public List<Route> getTop3RoutesWithMaxAverageRating () {
-        return this.routeRepository.getTop3RoutesWithMaxAverageRating();
+        return this.purchaseRepository.getTop3RoutesWithMaxAverageRating();
     }
     
     @Override

@@ -14,7 +14,7 @@ public interface RouteRepository extends MongoRepository<Route, ObjectId> {
     public List<Route> findAllByPriceIsLessThan(float price);
 
     @Aggregation(pipeline = {
-        // Junto las rutas y sus compras
+        /*// Junto las rutas y sus compras
         "{ $lookup: { from: 'purchase', localField: 'id', foreignField: 'route', as: 'purchases' } }",
         // Desarmo las compras, quedandome una combinacion ruta-compra 
         "{ $unwind: '$purchases' }",
@@ -33,14 +33,33 @@ public interface RouteRepository extends MongoRepository<Route, ObjectId> {
         // Desarmo las rutas, quedandome una combinacion routeId-route
         "{ $unwind: '$routes._id' }",
         // Reemplazo los documentos de forma que me quede solo route
-        "{ $replaceRoot: { newRoot: '$routes._id' } }"
+        "{ $replaceRoot: { newRoot: '$routes._id' } }"*/
+
+        // Desarmo las compras
+        "{ $unwind: '$purchases' }",
+        // Me quedo solo con las compras
+        "{ $replaceRoot: { newRoot: '$purchases' } }",
+        // Me quedo con las compras con rating 1 en su review
+        "{ $match: { 'review.rating': 1 } }",
+        // Me quedo solo con el Id de la ruta
+        "{ $project: { routeId: '$route' } }",
+        // Junto los ID para evitar repetidos
+        "{ $group: { _id: '$routeId' } }",
+        // Cambio el nombre _id a RouteId
+        "{ $project: { routeId: '$_id' } }", 
+        // Busco las rutas con (logicamente según entiendo) con rating 1
+        "{ $lookup: { from: 'route', localField: 'routeId', foreignField: '_id' , as: 'routes' } }",
+        // Desarmo las rutas, quedandome una combinacion routeId-route
+        "{ $unwind: '$routes' }",
+        // Reemplazo los documentos de forma que me quede solo route
+        "{ $replaceRoot: { newRoot: '$routes' } }"
     })
     public List<Route> getRoutesWithMinRating ();
     //No funciona y no se porque
 
 
     @Aggregation(pipeline = {
-         // Junto las rutas y sus compras
+        /*// Junto las rutas y sus compras
         "{ $lookup: { from: 'purchase', localField: '_id', foreignField: 'route', as: 'purchases' } }",
         // Desarmo las compras, quedandome una combinacion ruta-compra 
         "{ $unwind: '$purchases' }",
@@ -63,17 +82,59 @@ public interface RouteRepository extends MongoRepository<Route, ObjectId> {
         // Desarmo las rutas, quedandome una combinacion routeId-route
         "{ $unwind: '$routes' }",
         // Reemplazo los documentos de forma que me quede solo route
-        "{ $replaceRoot: { newRoot: '$routes._id' } }"
+        "{ $replaceRoot: { newRoot: '$routes._id' } }"*/
+
+        /*// Desarmo las compras
+        "{ $unwind: '$purchases' }",
+        // Me quedo solo con las compras
+        "{ $replaceRoot: { newRoot: '$purchases' } }",
+        "{ $project: { routeId: '$route', rating: '$review.rating' } }",
+        // Agrupo las rutas calculando su rating promedio
+        "{ $group: { _id: '$routeId', avgRating: { $avg: '$rating' } } }",
+        // Cambio el nombre _id a RouteId
+        "{ $project: { routeId: '$_id', avgRating: 1 } }", 
+        // Ordeno de Mayor a Menor el Rating
+        "{ $sort: { avgRating: -1 } }",
+        // Me quedo con los tres mayores
+        "{ $limit: 3 }",
+        // Me quedo solo con el Id de la ruta
+        "{ $project: { routeId: '$_id' } }",
+        // Busco las 3 rutas con (logicamente según entiendo) con el mayor promedio de rating
+        "{ $lookup: { from: 'route', localField: 'routeId', foreignField: '_id' , as: 'routes' } }",
+        // Desarmo las rutas, quedandome una combinacion routeId-route
+        "{ $unwind: '$routes' }",
+        // Reemplazo los documentos de forma que me quede solo route
+        "{ $replaceRoot: { newRoot: '$routes' } }"*/
+
+        // Desarmo las compras
+        "{ $unwind: '$purchases' }",
+        // Me quedo solo con las compras
+        "{ $replaceRoot: { newRoot: '$purchases' } }",
+        // Filtramos compras con rating válido
+        "{ $match: { 'review': { $exists: true } } }",
+        // Me quedo con la ruta y el rating
+        "{ $project: { routeId: '$route.$id', rating: '$review.rating' } }",
+        // Agrupamos por ruta, calculamos promedio y cantidad
+        "{ $group: { _id: '$routeId', averageRating: { $avg: '$rating' } } }",
+        // Ordenamos por promedio descendente
+        "{ $sort: { averageRating: -1 } }",
+        // Top 3
+        "{ $limit: 3 }",
+        // Buscamos info de la ruta
+        "{ $lookup: { from: 'route', localField: '_id', foreignField: '_id', as: 'routeDetails' } }",
+        // Desempaquetamos el resultado
+        "{ $unwind: '$routeDetails' }",
+        // Proyectamos los campos deseados
+        "{ $replaceRoot: { newRoot: '$routeDetails' } }"
     })
     public List<Route> getTop3RoutesWithMaxAverageRating ();
-    //No funciona y no se porque
 
 
    @Aggregation(pipeline = {
         // Desarmo las compras de la ruta
         "{ $unwind: '$purchases' }",
         // Proyecto la ruta y la compra
-        "{ $project: { routeId: '$_id', purchaseId: 'purchases.$_id' } }",
+        "{ $project: { routeId: '$_id', purchaseId: '$purchases._id' } }",
         // Agrupo por la ruta y cuento sus compras
         "{ $group: { _id: '$routeId', cantPurchases: { $sum: 1 } } }",
         // Cambio el nombre _id a RouteId
@@ -87,7 +148,7 @@ public interface RouteRepository extends MongoRepository<Route, ObjectId> {
         // Desarmo la ruta
         "{ $unwind: '$route' }",
         // Reemplazar root por el documento original de la ruta
-        "{ $replaceRoot: { newRoot: '$route._id' } }"
+        "{ $replaceRoot: { newRoot: '$route' } }"
     })
     public Route getMostBestSellingRoute();
     //No funciona y nose porque
