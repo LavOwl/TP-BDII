@@ -332,29 +332,43 @@ public class ToursServiceImpl implements ToursService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Route> getTop3RoutesWithMaxAverageRating(){return null;}
+    public List<Route> getTop3RoutesWithMaxAverageRating () {
+        return this.purchaseRepository.getTop3RoutesWithMaxAverageRating();
+    }
     
     @Override
     @Transactional(readOnly = true)
-    public List<Route> getRoutesWithMinRating(){return null;}
+    public List<Route> getRoutesWithMinRating () {
+        return this.purchaseRepository.getRoutesWithMinRating();
+    }
     
     @Override
     @Transactional(readOnly = true)
-    public Service getMostDemandedService(){return null;}
+    public Service getMostDemandedService () {
+        return this.serviceRepository.getMostDemandedService();
+    }
     
     @Override
     @Transactional(readOnly = true)
-    public Route getMostBestSellingRoute(){return null;}
+    public Route getMostBestSellingRoute () {
+        return this.routeRepository.getMostBestSellingRoute();
+    }
     
     @Override
     @Transactional(readOnly = true)
-    public List<Service> getServiceNoAddedToPurchases(){return null;}
+    public List<Service> getServiceNoAddedToPurchases () {
+        return null; // this.serviceRepository.getServiceNoAddedToPurchases(); // Nose como carajos haria un not exist acá
+    }
     
     @Override
     @Transactional(readOnly = true)
-    public List<TourGuideUser> getTourGuidesWithRating1(){return null;}
+    public List<TourGuideUser> getTourGuidesWithRating1 () {
+        return userRepository.getTourGuidesWithRating1();
+    }
     
     @Override
     @Transactional(readOnly = true)
-    public DriverUser getDriverUserWithMoreRoutes(){return null;}
+    public DriverUser getDriverUserWithMoreRoutes () {
+        return userRepository.getDriverUserWithMoreRoutes();
+    }
 }
