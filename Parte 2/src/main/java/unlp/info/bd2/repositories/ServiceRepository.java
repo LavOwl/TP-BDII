@@ -51,5 +51,6 @@ public interface ServiceRepository extends MongoRepository<Service, ObjectId> {
     })  
     public Service getMostDemandedService ();
     // Este me sorprendio, a veces pasa y a veces no, no siempre encuentra el más demandado, podría probar haciendolo
-    // con un lookup a Purchases a ver si hay un problema de consistencia con el itemServiceList actual
+    // con un lookup a Purchases a ver si hay un problema de consistencia con el itemServiceList actual, pero va a 
+    // estar el problema del ObjectID visto antes
 }

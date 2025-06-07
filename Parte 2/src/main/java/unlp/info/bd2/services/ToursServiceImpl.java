@@ -330,7 +330,7 @@ public class ToursServiceImpl implements ToursService {
     @Override
     @Transactional(readOnly = true)
     public List<Route> getRoutesWithMinRating () {
-        return this.routeRepository.getRoutesWithMinRating();
+        return this.purchaseRepository.getRoutesWithMinRating();
     }
     
     @Override
