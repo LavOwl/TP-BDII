@@ -301,23 +301,32 @@ public class ToursServiceImpl implements ToursService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Route> getTop3RoutesWithMoreStops(){return null;}
+    public List<Route> getTop3RoutesWithMoreStops(){
+        return routeRepository.getTopNRoutesWithMoreStops(3);}
     
     @Override
     @Transactional(readOnly = true)
-    public Long getCountOfPurchasesBetweenDates(Date start, Date end){return null;}
+    public Long getCountOfPurchasesBetweenDates(Date start, Date end){
+        return purchaseRepository.countByDateBetween(start, end);
+    }
     
     @Override
     @Transactional(readOnly = true)
-    public List<Route> getRoutesWithStop(Stop stop){return null;}
+    public List<Route> getRoutesWithStop(Stop stop){
+        return routeRepository.findByStopsContaining(stop);
+    }
     
     @Override
     @Transactional(readOnly = true)
-    public Long getMaxStopOfRoutes(){return null;}
+    public Long getMaxStopOfRoutes(){
+        return routeRepository.getMaxStopOfRoutes();
+    }
     
     @Override
     @Transactional(readOnly = true)
-    public Long getMaxServicesOfSupplier(){return null;}
+    public Long getMaxServicesOfSupplier(){
+        return supplierRepository.getMaxServicesOfSupplier();
+    }
     
     //Franco
 

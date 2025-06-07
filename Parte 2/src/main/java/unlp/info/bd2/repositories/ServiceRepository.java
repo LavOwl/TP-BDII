@@ -27,4 +27,10 @@ public interface ServiceRepository extends MongoRepository<Service, ObjectId> {
         "{$replaceRoot: {newRoot: '$sup'}}"
     })
     public List<Supplier> getTopNSuppliersInItemsSold(int n); //Debería estar en SupplierRepository, pero te la recontra re regalo.
+
+
+
+
+
+
 }

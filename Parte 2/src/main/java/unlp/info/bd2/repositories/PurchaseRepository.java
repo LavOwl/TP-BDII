@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import unlp.info.bd2.model.Purchase;
 import unlp.info.bd2.model.Supplier;
 import unlp.info.bd2.model.User;
+import java.util.Date;
 
 @Repository
 public interface PurchaseRepository extends MongoRepository<Purchase, ObjectId> {
@@ -40,4 +41,7 @@ public interface PurchaseRepository extends MongoRepository<Purchase, ObjectId> 
         "{$replaceRoot: {newRoot: '$_id'}}"
     })
     public List<Supplier> getTopNMostPresentSuppliers(int n);
+
+
+    public Long countByDateBetween(Date start, Date end);
 }
