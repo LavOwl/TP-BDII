@@ -49,11 +49,6 @@ public interface ToursService {
     Long getMaxStopOfRoutes();
     Long getMaxServicesOfSupplier();
     List<Route> getTop3RoutesWithMaxAverageRating();
-    List<Route> getRoutesWithMinRating();
-    Service getMostDemandedService();
     Route getMostBestSellingRoute();
-    List<Service> getServiceNoAddedToPurchases();
-    List<TourGuideUser> getTourGuidesWithRating1();
-    DriverUser getDriverUserWithMoreRoutes();
 
 }

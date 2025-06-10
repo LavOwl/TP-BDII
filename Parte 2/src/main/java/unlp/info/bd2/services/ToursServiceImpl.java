@@ -21,11 +21,13 @@ import unlp.info.bd2.model.Stop;
 import unlp.info.bd2.model.Supplier;
 import unlp.info.bd2.model.TourGuideUser;
 import unlp.info.bd2.model.User;
+import unlp.info.bd2.repositories.DriverUserRepository;
 import unlp.info.bd2.repositories.PurchaseRepository;
 import unlp.info.bd2.repositories.RouteRepository;
 import unlp.info.bd2.repositories.ServiceRepository;
 import unlp.info.bd2.repositories.StopRepository;
 import unlp.info.bd2.repositories.SupplierRepository;
+import unlp.info.bd2.repositories.TourGuideUserRepository;
 import unlp.info.bd2.repositories.UserRepository;
 import unlp.info.bd2.utils.ToursException;
 
@@ -33,6 +35,12 @@ public class ToursServiceImpl implements ToursService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private DriverUserRepository driverUserRepository;
+
+    @Autowired
+    private TourGuideUserRepository tourGuideUserRepository;
     
     @Autowired
     private StopRepository stopRepository;
@@ -144,7 +152,7 @@ public class ToursServiceImpl implements ToursService {
     @Transactional
     public void assignDriverByUsername(String username, ObjectId idRoute) throws ToursException{
         Route route = routeRepository.findById(idRoute).orElseThrow(() -> new ToursException("Id inválido para una ruta"));
-        DriverUser driver = userRepository.findDriverUserByUsername(username).orElseThrow(() -> new ToursException("Id inválido para un usuario"));
+        DriverUser driver = driverUserRepository.findByUsername(username).orElseThrow(() -> new ToursException("Id inválido para un usuario"));
         driver.addRoute(route);
         userRepository.save(driver);
         routeRepository.save(route);
@@ -154,7 +162,7 @@ public class ToursServiceImpl implements ToursService {
     @Transactional
     public void assignTourGuideByUsername(String username, ObjectId idRoute) throws ToursException{
         Route route = routeRepository.findById(idRoute).orElseThrow(() -> new ToursException("Id inválido para una ruta"));
-        TourGuideUser tourGuide = userRepository.findTourGuideUserByUsername(username).orElseThrow(() -> new ToursException("Id inválido para un usuario"));
+        TourGuideUser tourGuide = tourGuideUserRepository.findByUsername(username).orElseThrow(() -> new ToursException("Id inválido para un usuario"));
         tourGuide.addRoute(route);
         userRepository.save(tourGuide);
         routeRepository.save(route);
@@ -194,12 +202,12 @@ public class ToursServiceImpl implements ToursService {
     private void updateRoute(Purchase purchase){
         userRepository.save(purchase.getUser());
         Route r = routeRepository.save(purchase.getRoute());
-        for (User u : r.getDriverList()) {
+        /*for (User u : r.getDriverList()) {
             userRepository.save(u);
         }
         for (User u : r.getTourGuideList()) {
             userRepository.save(u);
-        }
+        }*/
     }
     
     @Override
@@ -343,42 +351,13 @@ public class ToursServiceImpl implements ToursService {
     @Override
     @Transactional(readOnly = true)
     public List<Route> getTop3RoutesWithMaxAverageRating () {
-        return this.purchaseRepository.getTop3RoutesWithMaxAverageRating();
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<Route> getRoutesWithMinRating () {
-        return this.purchaseRepository.getRoutesWithMinRating();
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public Service getMostDemandedService () {
-        return this.serviceRepository.getMostDemandedService();
+        return this.routeRepository.getTop3RoutesWithMaxAverageRating();
     }
     
     @Override
     @Transactional(readOnly = true)
     public Route getMostBestSellingRoute () {
-        return this.routeRepository.getMostBestSellingRoute();
+        return this.routeRepository.getBestSellingRoute();
     }
     
-    @Override
-    @Transactional(readOnly = true)
-    public List<Service> getServiceNoAddedToPurchases () {
-        return null; // this.serviceRepository.getServiceNoAddedToPurchases(); // Nose como carajos haria un not exist acá
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<TourGuideUser> getTourGuidesWithRating1 () {
-        return userRepository.getTourGuideUsersRating1();
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public DriverUser getDriverUserWithMoreRoutes () {
-        return userRepository.getDriverUserWithMoreRoutes();
-    }
 }

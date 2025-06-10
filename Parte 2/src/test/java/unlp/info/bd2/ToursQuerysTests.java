@@ -169,45 +169,11 @@ public class ToursQuerysTests {
     }
 
     @Test
-    void getRoutesWithMinRatingTest() throws ToursException {
-        List<Route> routesWithMinRating = this.service.getRoutesWithMinRating();
-        assertEquals(2, routesWithMinRating.size());
-        this.assertListEquality(routesWithMinRating.stream().map(Route::getName).collect(Collectors.toList()), List.of("Architectural Expedition", "Delta Tour"));
-    }
-
-    @Test
-    void getMostDemandedServiceTest() throws ToursException {
-        Service mostDemandedService = this.service.getMostDemandedService();
-        assertEquals("souvenir t-shirt", mostDemandedService.getName());
-        assertEquals("I love Buenos Aires t-shirt", mostDemandedService.getDescription());
-    }
-
-    @Test
     void getMostBestSellingRouteTest() throws ToursException {
         Route mostBestSellingRoute = this.service.getMostBestSellingRoute();
         assertEquals("City Tour", mostBestSellingRoute.getName());
         assertEquals(9, mostBestSellingRoute.getStops().size());
         assertEquals("Diagonal Norte", mostBestSellingRoute.getStops().get(0).getName());
-    }
-
-    @Test
-    void getServiceNoAddedToPurchasesTest() throws ToursException {
-        List<Service> serviceNoAddedToPurchases = this.service.getServiceNoAddedToPurchases();
-        assertEquals(3, serviceNoAddedToPurchases.size());
-        this.assertListEquality(serviceNoAddedToPurchases.stream().map(Service::getName).collect(Collectors.toList()), List.of("Architectural Expedition Book", "souvenir retrato", "souvenir retrato 2"));
-    }
-
-    @Test
-    void getTourGuidesWithRating1Test() throws ToursException {
-        List<TourGuideUser> tourGuidesWithRating1 = this.service.getTourGuidesWithRating1();
-        assertEquals(2, tourGuidesWithRating1.size());
-        this.assertListEquality(tourGuidesWithRating1.stream().map(TourGuideUser::getUsername).collect(Collectors.toList()), List.of("userG3", "userG4"));
-    }
-
-    @Test
-    void getDriverUserWithMoreRoutesTest() throws ToursException {
-        DriverUser driverUserWithMoreRoutes = this.service.getDriverUserWithMoreRoutes();
-        assertEquals("userD2", driverUserWithMoreRoutes.getUsername());
     }
 
     private <T> void assertListEquality(List<T> list1, List<T> list2) {

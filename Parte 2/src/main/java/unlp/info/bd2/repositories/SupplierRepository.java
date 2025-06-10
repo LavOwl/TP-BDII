@@ -27,11 +27,11 @@ public interface SupplierRepository extends MongoRepository<Supplier, ObjectId> 
 
 
     @Aggregation(pipeline = {
-    "{$unwind: '$services'}",
-    "{$group: {_id: '$_id', count: {$sum: 1}}}",
-    "{$sort: {count: -1}}",
-    "{$limit: 1}",
-    "{$project: {_id: 0, count: 1}}"
+        "{$unwind: '$services'}",
+        "{$group: {_id: '$_id', count: {$sum: 1}}}",
+        "{$sort: {count: -1}}",
+        "{$limit: 1}",
+        "{$project: {_id: 0, count: 1}}"
     })
     public Long getMaxServicesOfSupplier();
 }

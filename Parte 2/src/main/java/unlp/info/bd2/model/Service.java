@@ -26,7 +26,7 @@ public class Service {
     @DBRef
     private List<ItemService> itemServiceList = new ArrayList<ItemService>();
 
-    @DBRef //Might be better to have the Services embedded, if so, then maybe this should be transient.
+    @DBRef
     private Supplier supplier;
 
     public Service(String name, float price, String description, Supplier supplier){

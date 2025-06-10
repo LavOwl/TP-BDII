@@ -25,7 +25,7 @@ public class Supplier {
     @Indexed(unique = true)
     private String authorizationNumber;
 
-    @DBRef //Might be best to embed?
+    @DBRef
     private List<Service> services = new ArrayList<Service>();
 
     public Supplier(String businessName, String authorizationNumber){

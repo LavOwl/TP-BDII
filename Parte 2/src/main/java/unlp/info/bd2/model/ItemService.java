@@ -20,12 +20,7 @@ public class ItemService {
 
     private int quantity;
 
-    @Transient //OK, so, a bit of a fucked up field, don't really know what to do about it
-                //We can set it as Transient, which is all well and good, up and until we actually
-                //may need to access it... because the DB will not auto-fill the field
-                //we could also just set it as @DBRef, but that would make the children reference
-                //their parent, the one in which they are embedded, which is a tiny bit of an anti-pattern
-                //or we could do without it altogether, pero ya estaba acá de antes, so nose.
+    @Transient
     private Purchase purchase;
 
     @DBRef
