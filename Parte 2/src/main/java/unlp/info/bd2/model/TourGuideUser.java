@@ -7,13 +7,13 @@ import java.util.List;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import unlp.info.bd2.utils.ToursException;
 
-@Data
+@Getter
+@Setter
 @Document(collection = "users")
-@EqualsAndHashCode(callSuper = true)
 public class TourGuideUser extends User {
 
     private String education;
@@ -27,7 +27,10 @@ public class TourGuideUser extends User {
     }
 
     public void addRoute(Route route){
-        this.routes.add(route);
+        if(!this.routes.contains(route)){
+            this.routes.add(route);
+            route.addTourGuide(this);
+        }
     }
 
     @Override

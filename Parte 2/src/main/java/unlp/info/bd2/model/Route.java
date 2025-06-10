@@ -47,13 +47,31 @@ public class Route {
     }
 
     public void addTourGuide(TourGuideUser tourGuide){
-        this.tourGuideList.add(tourGuide);
-        tourGuide.addRoute(this);
+        if(!this.tourGuideList.contains(tourGuide)){
+            this.tourGuideList.add(tourGuide);
+            tourGuide.addRoute(this);
+        }
     }
 
     public void addDriver(DriverUser driverUser){
-        this.driverList.add(driverUser);
-        driverUser.addRoute(this);
+        if(!this.driverList.contains(driverUser)){
+            this.driverList.add(driverUser);
+            driverUser.addRoute(this);
+        }
+    }
+
+    public void setTourGuideList(List<TourGuideUser> tourGuideUsers){
+        for (TourGuideUser tourGuideUser : tourGuideUsers) {
+            tourGuideUser.addRoute(this);
+        }
+        this.tourGuideList = tourGuideUsers;
+    }
+
+    public void setDriverList(List<DriverUser> driverUsers){
+        for (DriverUser driverUser : driverUsers) {
+            driverUser.addRoute(this);
+        }
+        this.driverList = driverUsers;
     }
 
     public void addPurchase(Purchase purchase) throws ToursException{

@@ -20,8 +20,20 @@ public interface UserRepository extends MongoRepository<User, ObjectId> {
 
     @Aggregation({
         "{$match: {$expr: {$gte: [{$size: '$purchaseList'}, ?0]}}}"
-    })
+    }) // @Query("{ $where: 'this.purchaseList.length >= ?0' }") esto tmb es válido, pero usa JS y es más lento creo (no aprovecha índices?)
     public List<User> getUsersWithNPurchases(int n);
+
+    @Aggregation(pipeline = {
+        "{$addFields: {purchases: '$purchaseList'}}",
+        "{$unwind: '$purchases'}",
+        "{$lookup: {from: 'purchase', localField: 'purchases.$id', foreignField: '_id', as: 'purchase'}}",
+        "{$unwind: '$purchase'}",
+        "{$match: {'purchase.totalPrice': {$gte: ?0}}}",
+        "{$unset: ['purchase', 'purchases']}",
+        "{$group: {_id: '$_id', user: {$first: '$$ROOT'}}}",
+        "{$replaceRoot: {newRoot: '$user'}}"
+    })
+    public List<User> getUsersWithPurchasesOver(float amount); //Creo que es menos eficiente que el de compras. También se puede implementar con un $lookup
 
     @Aggregation(pipeline = {
         "{$addFields:{ count: {$size:'$purchaseList'}}}",
@@ -30,6 +42,20 @@ public interface UserRepository extends MongoRepository<User, ObjectId> {
     })
     public List<User> getTopNUsersMorePurchases(int n);
 
+    @Aggregation(pipeline = {
+        "{$match: {'_class': {$regex: 'TourGuideUser'}}}",
+        "{$unwind:'$routes'}",
+        "{$lookup:{from:'route', localField:'routes.$id', foreignField:'_id', as:'routes'}}",
+        "{$unwind:'$routes'}",
+        "{$lookup:{from:'purchase', localField:'routes._id', foreignField:'route.$id', as:'purchases'}}",
+        "{$unwind:'$purchases'}",
+        "{$match:{'purchases.review.rating':1}}",
+        "{$group:{_id:'$_id'}}",
+        "{$lookup:{from:'users', localField:'_id', foreignField:'_id', as:'tourGuides'}}",
+        "{$unwind:'$tourGuides'}",
+        "{$replaceRoot:{newRoot:'$tourGuides'}}"
+    })
+    public List<TourGuideUser> getTourGuideUsersRating1();
 
     @Aggregation(pipeline = {
         /*Este es el mio, tenia errores sintacticos y suspuestamente otros segun ChatGPT, dejo el que me tiro "supuestamente"

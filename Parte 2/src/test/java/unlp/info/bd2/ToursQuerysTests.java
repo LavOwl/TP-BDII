@@ -42,6 +42,7 @@ public class ToursQuerysTests {
     @BeforeAll
     public void prepareDB() throws Exception {
         mongoTemplate.getCollectionNames().stream().forEach(c -> mongoTemplate.remove(new Query(),c));
+        
         this.initializer.prepareDB();
     }
 

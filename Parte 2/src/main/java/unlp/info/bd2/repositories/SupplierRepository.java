@@ -16,17 +16,15 @@ public interface SupplierRepository extends MongoRepository<Supplier, ObjectId> 
     public Optional<Supplier> findByAuthorizationNumber(String authorizationNumber);
 
     @Aggregation(pipeline = {
-        "{$lookup: {from: 'service', localField: '_id', foreignField: 'supplier', as: 'serviceData'}}",
-        "{$unwind: '$serviceData'}",
-        "{$addFields: {purchaseCount: { $size: '$serviceData.purchases' }}}",
-        "{$group: {_id: '$_id', count: {$sum: '$purchaseCount'}}}",
-        "{$sort: {count: 1}}",
-        "{$limit: ?0}",
-        "{$lookup: {from: 'supplier', localField: '_id', foreignField: '_id', as: 'sup'}}",
-        "{$unwind: '$sup'}",
-        "{$replaceRoot: {newRoot: '$sup'}}"
+        "{$addFields: {services_ids: '$services'}}",
+        "{$lookup: {from: 'purchase', let: { providedServices: '$services' }, pipeline: [{ $match: {$expr: {$gt: [{ $size: {$filter: {input: '$itemServiceList.service',as: 'service',cond: { $in: ['$$service', '$$providedServices'] }}} },0]}} }]as: 'matchingPurchases'}}",
+        "{$addFields: {count: {$size: '$matchingPurchases'}}}",
+        "{$sort: {count: -1}}",
+        "{$unset: ['services', 'matchingPurchases', 'count']}",
+        "{$limit: ?0}"
     })
     public List<Supplier> getTopNSuppliersInPurchases(int n);
+
 
     @Aggregation(pipeline = {
     "{$unwind: '$services'}",
