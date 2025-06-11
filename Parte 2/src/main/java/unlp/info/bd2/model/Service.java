@@ -23,10 +23,10 @@ public class Service {
 
     private String description;
 
-    @DBRef
+    @DBRef(lazy = true)
     private List<ItemService> itemServiceList = new ArrayList<ItemService>();
 
-    @DBRef
+    @DBRef(lazy = true)
     private Supplier supplier;
 
     public Service(String name, float price, String description, Supplier supplier){

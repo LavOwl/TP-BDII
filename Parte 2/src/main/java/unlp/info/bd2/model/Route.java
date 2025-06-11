@@ -26,16 +26,16 @@ public class Route {
 
     private int maxNumberUsers;
 
-    @DBRef
+    @DBRef(lazy = true)
     private List<Stop> stops;
 
-    @DBRef
+    @DBRef(lazy = true)
     private List<DriverUser> driverList = new ArrayList<DriverUser>();
 
-    @DBRef
+    @DBRef(lazy = true)
     private List<TourGuideUser> tourGuideList = new ArrayList<TourGuideUser>();
 
-    @DBRef
+    @DBRef(lazy = true)
     private List<Purchase> purchases = new ArrayList<Purchase>();
 
     public Route(String name, float price, float totalKm, int maxNumberUsers, List<Stop> stops) {

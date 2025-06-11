@@ -41,7 +41,7 @@ public class User {
     @Setter(AccessLevel.PRIVATE)
     private boolean active;
 
-    @DBRef
+    @DBRef(lazy = true)
     private List<Purchase> purchaseList = new ArrayList<Purchase>();
 
     public User(String username, String password, String name, String email, Date birthdate, String phoneNumber) {

@@ -29,10 +29,10 @@ public class Purchase {
 
     private Date date;
 
-    @DBRef
+    @DBRef(lazy = true)
     private User user;
 
-    @DBRef
+    @DBRef(lazy = true)
     private Route route;
 
     //Embedded by default

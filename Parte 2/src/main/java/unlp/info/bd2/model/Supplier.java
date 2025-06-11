@@ -25,7 +25,7 @@ public class Supplier {
     @Indexed(unique = true)
     private String authorizationNumber;
 
-    @DBRef
+    @DBRef(lazy = true)
     private List<Service> services = new ArrayList<Service>();
 
     public Supplier(String businessName, String authorizationNumber){

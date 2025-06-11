@@ -23,7 +23,7 @@ public class ItemService {
     @Transient
     private Purchase purchase;
 
-    @DBRef
+    @DBRef(lazy = true)
     private Service service;
 
     public ItemService(int quantity, Service service, Purchase purchase){
