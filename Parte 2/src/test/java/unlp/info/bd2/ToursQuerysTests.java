@@ -44,6 +44,9 @@ public class ToursQuerysTests {
 
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
+    // Cambiamos este método en el test, ya que implementamos indices, y al droppear la BD también se pierden los 
+	// indices. Por lo tanto, en lugar de droppear la BD, borramos una a una las colecciones.
+	// Ya lo charlamos con Fede Di Claudio, y nos dijo que estaba bien.
     @BeforeAll
     public void prepareDB() throws Exception {
         mongoTemplate.getCollectionNames().stream().forEach(c -> mongoTemplate.remove(new Query(),c));

@@ -18,7 +18,7 @@ public class TourGuideUser extends User {
 
     private String education;
 
-    @DBRef(lazy = true)
+    @DBRef
     private List<Route> routes = new ArrayList<Route>();
 
     public TourGuideUser(String username, String password, String name, String email, Date birthdate, String phoneNumber, String education) {

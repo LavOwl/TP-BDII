@@ -19,7 +19,7 @@ public class DriverUser extends User {
 
     private String expedient;
 
-    @DBRef(lazy = true)
+    @DBRef
     private List<Route> routes = new ArrayList<Route>();
 
     public DriverUser(String username, String password, String name, String email, Date birthdate, String phoneNumber, String expedient) {
