@@ -306,7 +306,7 @@ public class ToursServiceImpl implements ToursService {
     @Override
     @Transactional(readOnly = true)
     public List<Supplier> getTopNSuppliersItemsSold(int n){
-        return serviceRepository.getTopNSuppliersInItemsSold(n);
+        return supplierRepository.getTopNSuppliersInItemsSold(n);
     }
 
     @Override

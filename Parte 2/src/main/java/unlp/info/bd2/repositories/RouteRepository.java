@@ -15,7 +15,6 @@ public interface RouteRepository extends MongoRepository<Route, ObjectId> {
     public List<Route> findAllByPriceIsLessThan(float price);
 
     @Aggregation(pipeline = {
-        // Este no funciona el primer lookup porque varia en tipos, en Route es ObjectID, y en Purchase es DBRef, y no puedo acceder a el ObjectID en el lookup
         // Junto las rutas y sus compras
         "{ $lookup: { from: 'purchase', localField: '_id', foreignField: 'route.$id', as: 'purchases' } }",
         // Desarmo las compras, quedandome una combinacion ruta-compra 

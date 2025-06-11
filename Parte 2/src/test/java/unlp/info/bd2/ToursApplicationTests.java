@@ -35,6 +35,9 @@ class ToursApplicationTests {
 
 	@BeforeEach
 	public void setUp(){
+		// Cambiamos esta línea en el test, ya que implementamos indices, y al droppear la BD también se pierden los 
+		// indices. Por lo tanto, en lugar de droppear la BD, borramos una a una las colecciones.
+		// Ya lo charlamos con Fede Di Claudio, y nos dijo que estaba bien.
 		mongoTemplate.getCollectionNames().stream().forEach(c -> mongoTemplate.remove(new Query(),c));
 		Calendar cal1 = Calendar.getInstance();
 		cal1.set(1980, Calendar.APRIL, 5);

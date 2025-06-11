@@ -34,4 +34,22 @@ public interface SupplierRepository extends MongoRepository<Supplier, ObjectId> 
         "{$project: {_id: 0, count: 1}}"
     })
     public Long getMaxServicesOfSupplier();
+
+
+    @Aggregation(pipeline = {
+        "{ $unwind: '$services' }",
+        "{ $lookup: { from: 'service', localField: 'services.$id', foreignField: '_id', as: 'service' } }",
+        "{ $unwind: '$service' }",
+        "{ $replaceRoot: { newRoot: '$service' } }",
+        "{ $unwind: '$itemServiceList' }",
+        "{ $project: { _id: 0, itemServiceList: 1, supplier: '$supplier.$id' } }",
+        "{ $group: { _id: '$supplier', count: {$sum: 1} } }",
+
+        "{ $sort: { count: -1 } }",
+        "{ $limit: ?0 }",
+        "{ $lookup: { from: 'supplier', localField: '_id', foreignField: '_id', as: 'sup' } }",
+        "{ $unwind: '$sup' }",
+        "{ $replaceRoot: { newRoot: '$sup' } }"
+    })
+    public List<Supplier> getTopNSuppliersInItemsSold(int n);
 }
