@@ -6,22 +6,15 @@
         (integer) 7
 
     2:
-    ZRANGE passengers 0 -1 WITHSCORES
+    ZRANGE passengers 0 -1
     -->
         1) "ivan"
-        2) "1"
-        3) "andrea"
-        4) "2"
-        5) "luciana"
-        6) "2"
-        7) "natalia"
-        8) "2.4"
-        9) "federico"
-        10) "2.5"
-        11) "julian"
-        12) "3"
-        13) "alejandra"
-        14) "4"
+        2) "andrea"
+        3) "luciana"
+        4) "natalia"
+        5) "federico"
+        6) "julian"
+        7) "alejandra"
 
     3:
     ZADD passengers 2.7 luciana
@@ -128,16 +121,12 @@
         (integer) 1
 
     3:
-    HGETALL user:cronos
+    HVALS user:cronos
     -->
-        1) "razon social"
-        2) "cronos s.a."
-        3) "domicilio"
-        4) "47 236 La Plata"
-        5) "tel\xc3\xa9fono" #Oops, creo que no le gustó la tilde
-        6) "2215556677"
-        7) "mail"
-        8) "info@cronos.com.ar"
+        1) "cronos s.a."
+        2) "47 236 La Plata"
+        3) "2215556677"
+        4) "info@cronos.com.ar"
 
     4:
     HGET user:cronos mail
@@ -167,11 +156,14 @@
         (integer) 0
     
     9:
-    HVALS user:cronos
+    HGETALL user:cronos
     -->
-        1) "cronos s.a."
-        2) "47 236 La Plata"
-        3) "info@cronos.com.ar"
+        1) "razon social"
+        2) "cronos s.a."
+        3) "domicilio"
+        4) "47 236 La Plata"
+        5) "mail"
+        6) "info@cronos.com.ar"
 
     10:
     HSTRLEN user:cronos mail
